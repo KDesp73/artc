@@ -1,0 +1,33 @@
+[options]
+width: 1080
+height: 720
+background: #000000
+
+[object1]
+type: circle
+x: center
+y: random
+size: 20
+color: #ffcc00
+motion: spin
+speed: 2
+radius: 100
+
+[object1]
+type: circle
+x: random
+y: center
+size: 20
+color: #ffccdd
+motion: pulse
+speed: 3
+radius: 100
+
+[object2]
+type: square
+x: random
+y: random
+size: 15
+color: #00ffff
+motion: drift
+speed: 2

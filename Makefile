@@ -2,7 +2,7 @@
 CC = gcc
 INCLUDE = -Iinclude -Ideps/include
 CFLAGS = -Wall -fPIC $(INCLUDE)
-LDFLAGS = -Ldeps/lib -lSDL2
+LDFLAGS = -Ldeps/lib -lSDL2 $(shell pkg-config --libs sdl2) -lm
 
 # Directories
 SRC_DIR = src
@@ -26,7 +26,7 @@ VERSION = $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 ifeq ($(type), RELEASE)
 	CFLAGS += -O3
 else
-	SANITIZERS = -fsanitize=address,undefined
+	# SANITIZERS = -fsanitize=address,undefined
 	CFLAGS  += -DDEBUG -ggdb
 	CFLAGS  += $(SANITIZERS)
 	LDFLAGS += $(SANITIZERS)
