@@ -12,7 +12,6 @@
 #include "io/cli.h"
 #define LOGGING_IMPLEMENTATION
 #include "io/logging.h"
-#include "SDL2/SDL.h"
 #include <stdbool.h>
 
 static bool validate_format(char* fmt)
@@ -29,8 +28,7 @@ static bool validate_format(char* fmt)
 
 int main(int argc, char** argv)
 {
-    // srand(73);
-    srand(time(NULL));
+    srand(73);
 
     int maj, min, pat;
     version(&maj, &min, &pat);

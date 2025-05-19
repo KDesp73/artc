@@ -1,0 +1,101 @@
+[options]
+width: 1280
+height: 720
+background: #101010
+
+[object1]
+type: circle
+x: center
+y: center
+size: 30
+color: #ff0000
+motion: spin
+speed: 2
+radius: 150
+
+[object2]
+type: square
+x: random
+y: random
+size: 20
+color: #00ff00
+motion: drift
+speed: 1.5
+
+[object3]
+type: circle
+x: 300
+y: 300
+size: 25
+color: #0000ff
+motion: pulse
+speed: 3
+radius: 60
+
+[object4]
+type: square
+x: 800
+y: 400
+size: 40
+color: #ffff00
+motion: none
+speed: 0
+
+[object5]
+type: circle
+x: random
+y: center
+size: 35
+color: #ff00ff
+motion: spin
+speed: 4
+radius: 100
+
+[object6]
+type: square
+x: center
+y: random
+size: 18
+color: #00ffff
+motion: drift
+speed: 2
+
+[object7]
+type: circle
+x: 100
+y: 100
+size: 22
+color: #ffffff
+motion: pulse
+speed: 2.5
+radius: 80
+
+[object8]
+type: square
+x: 600
+y: 200
+size: 28
+color: #ff8800
+motion: spin
+speed: 1
+radius: 70
+
+[object9]
+type: circle
+x: 1100
+y: 650
+size: 32
+color: #8888ff
+motion: drift
+speed: 3
+
+[object10]
+type: square
+x: center
+y: center
+size: 20
+color: #cccccc
+motion: pulse
+speed: 1.8
+radius: 50
+
