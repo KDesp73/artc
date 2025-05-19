@@ -4,6 +4,7 @@
 #include "art-object.h"
 #include "export.h"
 #include "files.h"
+#include "help.h"
 #include "scene.h"
 #include "view.h"
 #include "version.h"
@@ -14,6 +15,17 @@
 #include "SDL2/SDL.h"
 #include <stdbool.h>
 
+static bool validate_format(char* fmt)
+{
+    char* allowed[] = {
+        "gif", "mp4",
+    };
+    for(size_t i = 0; i < sizeof(allowed)/sizeof(allowed[0]); i++){
+        if(!strcmp(fmt, allowed[i])) return true;
+    }
+
+    return false;
+}
 
 int main(int argc, char** argv)
 {
@@ -27,21 +39,19 @@ int main(int argc, char** argv)
         cli_arg_new('h', "help", "", no_argument),
         cli_arg_new('v', "version", "", no_argument),
         cli_arg_new('x', "export", "", no_argument),
-        cli_arg_new('o', "output", "", required_argument),
         cli_arg_new('F', "format", "", required_argument),
         NULL
     );
 
     // CLI argument values
     bool export = false;
-    const char* output = NULL;
-    const char* format = "mp4";
+    char* format = "mp4";
 
     int opt;
     LOOP_ARGS(opt, args) {
         switch (opt) {
             case 'h':
-                // TODO: Help
+                help();
                 exit(0);
             case 'v':
                 printf("artc v%d.%d.%d\n", maj, min, pat);
@@ -49,11 +59,13 @@ int main(int argc, char** argv)
             case 'x':
                 export = true;
                 break;
-            case 'o':
-                output = optarg;
-                break;
             case 'F':
                 format = optarg;
+                if(!validate_format(format)) {
+                    ERRO("Invalid format: %s", format);
+                    exit(1);
+                }
+
                 break;
             default:
                 exit(1);
@@ -61,15 +73,15 @@ int main(int argc, char** argv)
     }
     cli_args_free(&args);
     printf("artc v%d.%d.%d\n", maj, min, pat);
-    if(!dir_exists(".artc")) dir_create(".artc");
+
+    if(dir_exists(".artc")) {
+        dir_remove(".artc");
+    }
+    dir_create(".artc");
 
     if (argc == 1 || argv[argc - 1][0] == '-') {
-        ERRO("Provide a .art file at the end of the arguments");
+        ERRO("Provide an .art file");
         return 1;
-    }
-
-    if (export && !output) {
-        output = "output.mp4";
     }
 
     const char* file = argv[argc - 1];
@@ -77,6 +89,7 @@ int main(int argc, char** argv)
         ERRO("The file must have a .art extension");
         return 1;
     }
+    char* output = swap_ext(file, format);
 
     Scene scene = SceneLoad(file);
 

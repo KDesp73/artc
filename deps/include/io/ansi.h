@@ -1,9 +1,6 @@
 #ifndef IO_ANSI_H
 #define IO_ANSI_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <stdarg.h>
 
 
@@ -27,13 +24,13 @@
 #define ANSI_SHOW_CURSOR() printf("\e[?25h")
 #define ANSI_GOTOXY(x,y) printf("\e[%d;%dH", (y), (x))
 #define ANSI_MOVE_CURSOR_UP(x) printf("\e[%zuA", x)
-#define ANSI_MOVE_CURSOR_DOWN(x) printf("\e[%dB", x);
-#define ANSI_MOVE_CURSOR_RIGHT(x) printf("\e[%dC", x);
-#define ANSI_MOVE_CURSOR_LEFT(x) printf("\e[%dD", x);
+#define ANSI_MOVE_CURSOR_DOWN(x) printf("\e[%dB", x)
+#define ANSI_MOVE_CURSOR_RIGHT(x) printf("\e[%dC", x)
+#define ANSI_MOVE_CURSOR_LEFT(x) printf("\e[%dD", x)
 #define ANSI_CLEAR_BELOW_CURSOR() printf("\e[J")
-#define ANSI_CURSOR_BLOCK() printf("\033[1 q");
-#define ANSI_CURSOR_UNDERSCORE() printf("\033[4 q");
-#define ANSI_CURSOR_BAR() printf("\033[5 q");
+#define ANSI_CURSOR_BLOCK() printf("\033[1 q")
+#define ANSI_CURSOR_UNDERSCORE() printf("\033[4 q")
+#define ANSI_CURSOR_BAR() printf("\033[5 q")
 
 #define ANSI_FG 0
 #define ANSI_BG 1
@@ -63,6 +60,10 @@ ANSIAPI void ansi_clear_screen();
 ANSIAPI void ansi_print_color_table();
 
 #ifdef ANSI_IMPLEMENTATION
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 ANSIAPI void ansi_combine(char* buffer, const char* seq1, const char* seq2)
 {
     if (seq1 == NULL || seq2 == NULL) {

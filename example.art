@@ -38,32 +38,8 @@ speed: 1.2
 type: circle
 x: random
 y: random
-size: 10
+size: 40
 color: #66ff66
 motion: pulse
 speed: 4
 range: 5
-
-[object5]
-type: square
-x: center
-y: center
-size: 20
-color: #ffffff
-motion: orbit
-speed: 2.5
-radius: 100
-angle: 0
-target: object1
-
-[object6]
-type: square
-x: center
-y: center
-size: 20
-color: #ff4444
-motion: orbit
-speed: 2.5
-radius: 100
-angle: 3.14
-target: object1

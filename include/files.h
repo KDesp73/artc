@@ -1,13 +1,15 @@
 #ifndef FILES_H
 #define FILES_H
 
+#include <dirent.h>
 #include <errno.h>
 #include <linux/limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include <sys/stat.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 // Check if the path is a file
 static inline bool is_file(const char* path) 
@@ -174,6 +176,65 @@ static inline int create_parent_directories(const char *path)
     }
 
     return 0; // Success
+}
+
+static inline char* swap_ext(const char* filename, const char* new_ext)
+{
+    const char* dot = strrchr(filename, '.');
+    size_t base_len = dot ? (size_t)(dot - filename) : strlen(filename);
+
+    // +1 for '.', +strlen(new_ext), +1 for null terminator
+    size_t total_len = base_len + 1 + strlen(new_ext) + 1;
+    char* result = malloc(total_len);
+    if (!result) return NULL;
+
+    strncpy(result, filename, base_len);
+    result[base_len] = '\0';
+    strcat(result, ".");
+    strcat(result, new_ext);
+
+    return result;
+}
+
+
+int dir_remove(const char* path)
+{
+    DIR* dir = opendir(path);
+    if (!dir) return -1;
+
+    struct dirent* entry;
+    char filepath[4096];
+
+    while ((entry = readdir(dir)) != NULL) {
+        // Skip . and ..
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+            continue;
+
+        snprintf(filepath, sizeof(filepath), "%s/%s", path, entry->d_name);
+
+        struct stat st;
+        if (stat(filepath, &st) == -1) {
+            closedir(dir);
+            return -1;
+        }
+
+        if (S_ISDIR(st.st_mode)) {
+            if (dir_remove(filepath) != 0) {
+                closedir(dir);
+                return -1;
+            }
+        } else {
+            if (unlink(filepath) != 0) {
+                closedir(dir);
+                return -1;
+            }
+        }
+    }
+
+    closedir(dir);
+
+    // Remove the directory itself
+    return rmdir(path);
 }
 
 #endif // FILES_H

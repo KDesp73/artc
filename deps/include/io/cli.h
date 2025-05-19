@@ -145,11 +145,11 @@ CLIAPI void cli_args_to_options(struct option options[], cli_args_t args)
 
 CLIAPI void cli_help(cli_args_t args, const char* usage, const char* footer)
 {
-    const char* ANSI_RED = "\e[31m";
-    const char* ANSI_GREEN = "\e[32m";
-    const char* ANSI_YELLOW = "\e[33m";
-    const char* ANSI_RESET = "\e[0;39m";
-    const char* ANSI_BOLD = "\e[1m";
+    const char* RED = "\e[31m";
+    const char* GREEN = "\e[32m";
+    const char* YELLOW = "\e[33m";
+    const char* RESET = "\e[0;39m";
+    const char* BOLD = "\e[1m";
 
     int max_length = 0;
 
@@ -165,10 +165,10 @@ CLIAPI void cli_help(cli_args_t args, const char* usage, const char* footer)
     }
     max_length += 2;
 
-    printf("%sUSAGE%s\n", ANSI_BOLD, ANSI_RESET);
+    printf("%sUSAGE%s\n", BOLD, RESET);
     printf("  %s\n\n", usage);
 
-    printf("%sOPTIONS%s\n", ANSI_BOLD, ANSI_RESET);
+    printf("%sOPTIONS%s\n", BOLD, RESET);
     for(size_t i = 0; i < args.count; i++){
         cli_arg_t arg = *args.args[i];
 
@@ -180,13 +180,13 @@ CLIAPI void cli_help(cli_args_t args, const char* usage, const char* footer)
 
         switch(args.args[i]->argument_required){
             case no_argument:
-                printf("%s[no argument]%s", ANSI_RED, ANSI_RESET);
+                printf("%s[no argument]%s", RED, RESET);
                 break;
             case required_argument:
-                printf("%s[requires argument]%s", ANSI_GREEN, ANSI_RESET);
+                printf("%s[requires argument]%s", GREEN, RESET);
                 break;
             case optional_argument:
-                printf("%s[optional argument]%s", ANSI_YELLOW, ANSI_RESET);
+                printf("%s[optional argument]%s", YELLOW, RESET);
                 break;
         }
         printf("\n");
