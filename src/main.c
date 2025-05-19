@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "art-object.h"
 #include "export.h"
+#include "files.h"
 #include "scene.h"
 #include "view.h"
 #include "version.h"
@@ -15,7 +17,8 @@
 
 int main(int argc, char** argv)
 {
-    srand(73);
+    // srand(73);
+    srand(time(NULL));
 
     int maj, min, pat;
     version(&maj, &min, &pat);
@@ -58,10 +61,15 @@ int main(int argc, char** argv)
     }
     cli_args_free(&args);
     printf("artc v%d.%d.%d\n", maj, min, pat);
+    if(!dir_exists(".artc")) dir_create(".artc");
 
-    if (argv[argc - 1][0] == '-') {
+    if (argc == 1 || argv[argc - 1][0] == '-') {
         ERRO("Provide a .art file at the end of the arguments");
         return 1;
+    }
+
+    if (export && !output) {
+        output = "output.mp4";
     }
 
     const char* file = argv[argc - 1];
@@ -75,63 +83,71 @@ int main(int argc, char** argv)
     View view = {0};
     view.width = scene.options.width;
     view.height = scene.options.height;
-    ViewInit(&view);
+    if (!ViewInit(&view)) return 1;
 
     bool running = true;
     SDL_Event event;
     int frame = 0;
 
+    const int target_fps = 30;
+    const int frame_delay = 1000 / target_fps;
     while (running) {
+        Uint32 frame_start = SDL_GetTicks();
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT)
                 running = false;
         }
 
-        float t = frame * 0.05f; // Time variable for motion
+        float t = frame * 0.05f;
 
-        // Clear screen with background color
         SDL_SetRenderDrawColor(view.renderer,
                 scene.options.background.r,
                 scene.options.background.g,
                 scene.options.background.b, 255);
-        SDL_RenderClear(view.renderer);
+        SDL_FillRect(view.surface, NULL, SDL_MapRGBA(view.surface->format,
+                    scene.options.background.r,
+                    scene.options.background.g,
+                    scene.options.background.b, 255));
 
-        // Update and draw each object
         for (int i = 0; i < scene.count; i++) {
             ArtObject* o = &scene.objects[i];
             ObjectUpdate(o, t);
             ObjectPaint(o, &view);
         }
 
+        SDL_UpdateTexture(view.texture, NULL, view.surface->pixels, view.surface->pitch);
+        SDL_RenderClear(view.renderer);
+        SDL_RenderCopy(view.renderer, view.texture, NULL, NULL);
         SDL_RenderPresent(view.renderer);
 
         if(export) {
             // Save frame to PPM
             char ppm_file[64];
-            snprintf(ppm_file, sizeof(ppm_file), "frame%04d.ppm", frame); // pad for ffmpeg
-            save_frame_ppm(ppm_file, view.width, view.height, view.renderer);
+            snprintf(ppm_file, sizeof(ppm_file), ".artc/frame%04d.ppm", frame); // pad for ffmpeg
+            save_frame_ppm(ppm_file, view.width, view.height, view.surface);
         }
 
-        SDL_Delay(33); // ~30 FPS
+        Uint32 frame_time = SDL_GetTicks() - frame_start;
+        if (frame_delay > frame_time) {
+            SDL_Delay(frame_delay - frame_time);
+        }
         frame++;
     }
 
     if(export){
         char command[256];
         if(strcmp(format, "mp4") == 0) {
-            snprintf(command, 256, "ffmpeg -v quiet -framerate 30 -i frame%%04d.ppm -pix_fmt yuv420p %s", output);
+            snprintf(command, 256, "ffmpeg -v quiet -framerate 30 -i .artc/frame%%04d.ppm -pix_fmt yuv420p %s", output);
             system(command);
         } else if(strcmp(format, "gif") == 0) {
-            system("ffmpeg -framerate 30 -i frame%04d.ppm -filter_complex \"[0:v] palettegen\" palette.png");
-            snprintf(command, 256, "ffmpeg -framerate 30 -i frame%%04d.ppm -i palette.png -filter_complex \"[0:v][1:v] paletteuse\" %s", output);
+            system("ffmpeg -v quiet -framerate 30 -i .artc/frame%04d.ppm -filter_complex \"[0:v] palettegen\" .artc/palette.png");
+            snprintf(command, 256, "ffmpeg -v quiet -framerate 30 -i .artc/frame%%04d.ppm -i .artc/palette.png -filter_complex \"[0:v][1:v] paletteuse\" %s", output);
             system(command);
         }
     }
 
 cleanup:
     ViewFree(&view);
-    SDL_Quit();
-
 
     return 0;
 }

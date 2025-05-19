@@ -13,6 +13,7 @@ typedef struct {
 
 typedef struct {
     SceneOptions options;
+
     ArtObject objects[MAX_OBJECTS];
     int count;
 } Scene;

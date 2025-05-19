@@ -8,6 +8,9 @@
 typedef struct {
    SDL_Window* window;
    SDL_Renderer* renderer;
+   SDL_Surface* surface;
+   SDL_Texture* texture;
+
    size_t width;
    size_t height;
    char title[64];

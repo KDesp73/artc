@@ -6,28 +6,64 @@ background: #000000
 [object1]
 type: circle
 x: center
-y: random
-size: 20
+y: center
+size: 30
 color: #ffcc00
 motion: spin
 speed: 2
-radius: 100
-
-[object1]
-type: circle
-x: random
-y: center
-size: 20
-color: #ffccdd
-motion: pulse
-speed: 3
-radius: 100
+radius: 150
+phase: 0
 
 [object2]
+type: circle
+x: center
+y: center
+size: 25
+color: #ff66aa
+motion: spin
+speed: 3
+radius: 200
+phase: 1.57
+
+[object3]
 type: square
 x: random
 y: random
-size: 15
-color: #00ffff
+size: 20
+color: #00ccff
 motion: drift
-speed: 2
+speed: 1.2
+
+[object4]
+type: circle
+x: random
+y: random
+size: 10
+color: #66ff66
+motion: pulse
+speed: 4
+range: 5
+
+[object5]
+type: square
+x: center
+y: center
+size: 20
+color: #ffffff
+motion: orbit
+speed: 2.5
+radius: 100
+angle: 0
+target: object1
+
+[object6]
+type: square
+x: center
+y: center
+size: 20
+color: #ff4444
+motion: orbit
+speed: 2.5
+radius: 100
+angle: 3.14
+target: object1

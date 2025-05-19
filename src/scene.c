@@ -9,6 +9,12 @@ static MotionType parse_motion(const char* s)
     if (strcmp(s, "spin") == 0) return MOTION_SPIN;
     if (strcmp(s, "drift") == 0) return MOTION_DRIFT;
     if (strcmp(s, "pulse") == 0) return MOTION_PULSE;
+    if (strcmp(s, "swirl") == 0) return MOTION_SWIRL;
+    if (strcmp(s, "bounce") == 0) return MOTION_BOUNCE;
+    if (strcmp(s, "noise") == 0) return MOTION_NOISE;
+    if (strcmp(s, "zigzag") == 0) return MOTION_ZIGZAG;
+    if (strcmp(s, "wave") == 0) return MOTION_WAVE;
+
     return MOTION_STATIC;
 }
 
@@ -98,8 +104,7 @@ Scene SceneLoad(const char* filename)
                 } else if (strcmp(key, "type") == 0) {
                     obj->type = parse_type(val);
                 }
-            }
-        }
+            }        }
     }
 
     fclose(file);

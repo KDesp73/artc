@@ -6,6 +6,7 @@ compile_commands.json
 *.o
 
 artc
+.artc
 libartc.a
 libartc.so
 *.ppm

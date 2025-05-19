@@ -1,20 +1,22 @@
 #include "export.h"
 #include <SDL2/SDL_render.h>
 
-void save_frame_ppm(const char* filename, int width, int height, SDL_Renderer* renderer)
+void save_frame_ppm(const char* filename, int width, int height, SDL_Surface* surface)
 {
-    Uint32* pixels = malloc(width * height * sizeof(Uint32));
-    SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, pixels, width * sizeof(Uint32));
-
     FILE* f = fopen(filename, "wb");
+    if (!f) return;
+
     fprintf(f, "P6\n%d %d\n255\n", width, height);
 
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            Uint32 pixel = pixels[y * width + x];
-            Uint8 r = (pixel >> 16) & 0xff;
-            Uint8 g = (pixel >> 8) & 0xff;
-            Uint8 b = pixel & 0xff;
+    Uint8* pixels = (Uint8*)surface->pixels;
+    int pitch = surface->pitch;
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            Uint8* p = pixels + y * pitch + x * 4;
+            Uint8 r = p[0];
+            Uint8 g = p[1];
+            Uint8 b = p[2];
             fwrite(&r, 1, 1, f);
             fwrite(&g, 1, 1, f);
             fwrite(&b, 1, 1, f);
@@ -22,5 +24,4 @@ void save_frame_ppm(const char* filename, int width, int height, SDL_Renderer* r
     }
 
     fclose(f);
-    free(pixels);
 }

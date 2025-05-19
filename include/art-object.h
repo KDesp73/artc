@@ -8,7 +8,12 @@ typedef enum {
     MOTION_STATIC,
     MOTION_SPIN,
     MOTION_DRIFT,
-    MOTION_PULSE
+    MOTION_PULSE,
+    MOTION_BOUNCE,
+    MOTION_WAVE,
+    MOTION_ZIGZAG,
+    MOTION_SWIRL,
+    MOTION_NOISE,
 } MotionType;
 
 typedef enum {
