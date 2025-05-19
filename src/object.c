@@ -4,6 +4,7 @@
 void ObjectUpdate(ArtObject* o, float time)
 {
     switch (o->motion) {
+        case MOTION_STATIC: return;
         case MOTION_SPIN:
             o->x = o->cx + cos(time * o->speed) * o->radius;
             o->y = o->cy + sin(time * o->speed) * o->radius;
@@ -48,5 +49,32 @@ void ObjectPaint(ArtObject* o, View* view)
                 }
             }
         }
+    }
+}
+
+char* motion_to_string(MotionType motion)
+{
+    switch (motion) {
+    case MOTION_STATIC: return "static";
+    case MOTION_SPIN: return "spin";
+    case MOTION_DRIFT: return "drift";
+    case MOTION_PULSE: return "pulse";
+    case MOTION_BOUNCE: return "bounce";
+    case MOTION_WAVE: return "wave";
+    case MOTION_ZIGZAG: return "zigzag";
+    case MOTION_SWIRL: return "swirl";
+    case MOTION_NOISE: return "noise";
+    default: return "static";
+    }
+}
+
+char* object_type_to_string(ObjectType obj)
+{
+    switch (obj) {
+        case OBJECT_SQUARE: return "square";
+        case OBJECT_CIRCLE: return "circle";
+        case OBJECT_NONE:
+        default:
+            return "none";
     }
 }

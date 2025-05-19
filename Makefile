@@ -2,7 +2,7 @@
 CC = gcc
 INCLUDE = -Iinclude -Ideps/include
 CFLAGS = -Wall -fPIC $(INCLUDE)
-LDFLAGS = -Ldeps/lib -lSDL2 $(shell pkg-config --libs sdl2) -lm
+LDFLAGS = -Ldeps/lib -lSDL2 $(shell pkg-config --libs sdl2) -lm -l:liblua.a
 
 # Directories
 SRC_DIR = src

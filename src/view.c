@@ -59,5 +59,6 @@ void ViewFree(View* view)
     if (view->renderer) SDL_DestroyRenderer(view->renderer);
     if (view->window) SDL_DestroyWindow(view->window);
     SDL_Quit();
+    lua_close(view->L);
 }
 

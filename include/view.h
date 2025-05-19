@@ -1,6 +1,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include "lua/lua.h"
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_video.h>
 #include <stdbool.h>
@@ -10,6 +11,7 @@ typedef struct {
    SDL_Renderer* renderer;
    SDL_Surface* surface;
    SDL_Texture* texture;
+   lua_State* L;
 
    size_t width;
    size_t height;
@@ -19,5 +21,6 @@ typedef struct {
 bool ViewInit(View* view);
 void ViewFree(View* view);
 
+extern View view;
 
 #endif // RENDERER_H

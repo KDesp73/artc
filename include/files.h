@@ -197,7 +197,7 @@ static inline char* swap_ext(const char* filename, const char* new_ext)
 }
 
 
-int dir_remove(const char* path)
+static inline int dir_remove(const char* path)
 {
     DIR* dir = opendir(path);
     if (!dir) return -1;

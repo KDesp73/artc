@@ -15,14 +15,17 @@ typedef enum {
     MOTION_SWIRL,
     MOTION_NOISE,
 } MotionType;
+char* motion_to_string(MotionType motion);
 
 typedef enum {
     OBJECT_NONE = -1,
     OBJECT_SQUARE,
     OBJECT_CIRCLE
 } ObjectType;
+char* object_type_to_string(ObjectType obj);
 
 typedef struct {
+    int id;
     float x, y;
     float cx, cy;
     float size;

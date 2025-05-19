@@ -5,6 +5,7 @@
 #include "export.h"
 #include "files.h"
 #include "help.h"
+#include "lua/lua.h"
 #include "scene.h"
 #include "view.h"
 #include "version.h"
@@ -26,10 +27,9 @@ static bool validate_format(char* fmt)
     return false;
 }
 
+View view = {0};
 int main(int argc, char** argv)
 {
-    srand(73);
-
     int maj, min, pat;
     version(&maj, &min, &pat);
 
@@ -83,15 +83,19 @@ int main(int argc, char** argv)
     }
 
     const char* file = argv[argc - 1];
-    if (!strstr(file, ".art")) {
-        ERRO("The file must have a .art extension");
+    if (!strstr(file, ".art") && !strstr(file, ".lua")) {
+        ERRO("The file must have an .art or a .lua extension");
         return 1;
     }
     char* output = swap_ext(file, format);
 
     Scene scene = SceneLoad(file);
+    if(!scene.loaded) {
+        ERRO("Could not load scene");
+        return 1;
+    }
+    INFO("object count: %d", scene.count);
 
-    View view = {0};
     view.width = scene.options.width;
     view.height = scene.options.height;
     if (!ViewInit(&view)) return 1;
@@ -102,8 +106,12 @@ int main(int argc, char** argv)
 
     const int target_fps = 30;
     const int frame_delay = 1000 / target_fps;
+    Uint32 prev_time = SDL_GetTicks();
     while (running) {
         Uint32 frame_start = SDL_GetTicks();
+        float delta_time = (frame_start - prev_time) / 1000.0f;
+        prev_time = frame_start; 
+
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT)
                 running = false;
@@ -119,6 +127,17 @@ int main(int argc, char** argv)
                     scene.options.background.r,
                     scene.options.background.g,
                     scene.options.background.b, 255));
+
+        lua_getglobal(view.L, "update");
+        if (lua_isfunction(view.L, -1)) {
+            lua_pushnumber(view.L, delta_time);
+            if (lua_pcall(view.L, 1, 0, 0) != LUA_OK) {
+                fprintf(stderr, "Lua update error: %s\n", lua_tostring(view.L, -1));
+                lua_pop(view.L, 1);
+            }
+        } else {
+            lua_pop(view.L, 1); // not a function, pop
+        }
 
         for (int i = 0; i < scene.count; i++) {
             ArtObject* o = &scene.objects[i];
