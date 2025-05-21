@@ -1,22 +1,55 @@
 #include "art-object.h"
 #include <math.h>
 
+#include <math.h>
+#include <stdlib.h>
+
 void ObjectUpdate(ArtObject* o, float time)
 {
     switch (o->motion) {
-        case MOTION_STATIC: return;
+        case MOTION_STATIC:
+            return;
+
         case MOTION_SPIN:
-            o->x = o->cx + cos(time * o->speed) * o->radius;
-            o->y = o->cy + sin(time * o->speed) * o->radius;
+            o->x = o->cx + cosf(time * o->speed) * o->radius;
+            o->y = o->cy + sinf(time * o->speed) * o->radius;
             break;
 
         case MOTION_DRIFT:
-            o->x += cos(time) * o->speed;
-            o->y += sin(time) * o->speed;
+            o->x += cosf(time) * o->speed;
+            o->y += sinf(time) * o->speed;
             break;
 
         case MOTION_PULSE:
-            o->size = fabs(sin(time * o->speed)) * o->radius;
+            o->size = fabsf(sinf(time * o->speed)) * o->radius;
+            break;
+
+        case MOTION_BOUNCE:
+            o->x = o->cx;
+            o->y = o->cy + fabsf(sinf(time * o->speed)) * o->radius;
+            break;
+
+        case MOTION_WAVE:
+            o->x = o->cx + sinf(time * o->speed) * o->radius;
+            o->y = o->cy;
+            break;
+
+        case MOTION_ZIGZAG:
+            o->x = o->cx + (fmodf(time * o->speed, 2.0f) < 1.0f ? 1 : -1) * o->radius;
+            o->y = o->cy + sinf(time * o->speed) * o->radius * 0.5f;
+            break;
+
+        case MOTION_SWIRL:
+            {
+                float r = o->radius + sinf(time * o->speed) * o->radius * 0.5f;
+                o->x = o->cx + cosf(time * o->speed) * r;
+                o->y = o->cy + sinf(time * o->speed) * r;
+            }
+            break;
+
+        case MOTION_NOISE:
+            o->x = o->cx + ((rand() % 200) / 100.0f - 1.0f) * o->radius * 0.2f;
+            o->y = o->cy + ((rand() % 200) / 100.0f - 1.0f) * o->radius * 0.2f;
             break;
 
         default:
