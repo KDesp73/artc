@@ -1,5 +1,6 @@
 window(640, 480)
 bg("#000000")
+fps(60)
 
 local ids = {}
 

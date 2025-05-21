@@ -93,8 +93,6 @@ int main(int argc, char** argv)
     }
     cli_args_free(&args);
 
-    if(ascii){ export = false; }
-
     if(dir_exists(".artc")) {
         dir_remove(".artc");
     }
@@ -123,12 +121,16 @@ int main(int argc, char** argv)
     view.height = scene.options.height;
     if (!ViewInit(&view)) return 1;
 
+    if(ascii){ 
+        export = false;
+        view.fps = 30;
+    }
+
     bool running = true;
     SDL_Event event;
     int frame = 0;
 
-    const int target_fps = 30;
-    const int frame_delay = 1000 / target_fps;
+    const int frame_delay = 1000 / view.fps;
     Uint32 prev_time = SDL_GetTicks();
     while (running && keep_running) {
         Uint32 frame_start = SDL_GetTicks();
@@ -191,7 +193,7 @@ int main(int argc, char** argv)
     }
 
     if(export)
-        Export(format, output);
+        Export(format, output, view.fps);
 
 cleanup:
     ViewFree(&view);

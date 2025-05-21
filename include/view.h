@@ -13,6 +13,7 @@ typedef struct {
    SDL_Texture* texture;
    lua_State* L;
 
+   size_t fps;
    size_t width;
    size_t height;
    char title[64];

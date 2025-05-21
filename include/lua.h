@@ -15,7 +15,7 @@ int lua_color_to_hex(lua_State* L);
 int lua_clear_scene(lua_State* L);
 int lua_modify_object(lua_State* L);
 int lua_set_seed(lua_State* L);
-// TODO: fps()
+int lua_set_fps(lua_State* L);
 
 static inline void setup_lua(lua_State* L)
 {
@@ -31,6 +31,7 @@ static inline void setup_lua(lua_State* L)
     lua_register(L, "clear", lua_clear_scene);
     lua_register(L, "modify", lua_modify_object);
     lua_register(L, "seed", lua_set_seed);
+    lua_register(L, "fps", lua_set_fps);
 }
 
 #endif // ARTC_LUA_H

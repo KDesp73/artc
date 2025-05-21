@@ -48,6 +48,10 @@ function clear() end
 -- @param seed number
 function seed(seed) end
 
+--- Set the fps
+-- @param fps number
+function fps(fps) end
+
 --- Modify an existing object through its ID
 -- @param id number
 -- @param props table: {x, y, size, color, motion, speed, radius}

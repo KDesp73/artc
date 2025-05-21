@@ -1,6 +1,7 @@
 window(700, 550)
 bg("#000000")
 seed(42)
+fps(30)
 
 local cols, rows = 10, 8
 local spacing = 60

@@ -21,6 +21,7 @@ bool ViewInit(View* view)
     // Default values
     if(view->width == 0) view->width = DEFAULT_WIDTH;
     if(view->height == 0) view->height = DEFAULT_HEIGHT;
+    if(view->fps == 0) view->fps = 30;
     if (view->title[0] == '\0') strncpy(view->title, "artc", sizeof(view->title));
     if(strlen(view->title) == 0) strncpy(view->title, "artc", sizeof(view->title));
 

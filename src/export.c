@@ -1,15 +1,15 @@
 #include "export.h"
 #include <SDL2/SDL_render.h>
 
-void Export(const char* format, const char* output)
+void Export(const char* format, const char* output, size_t fps)
 {
     char command[256];
     if(strcmp(format, "mp4") == 0) {
-        snprintf(command, 256, "ffmpeg -v quiet -framerate 30 -i .artc/frame%%04d.ppm -pix_fmt yuv420p %s", output);
+        snprintf(command, 256, "ffmpeg -v quiet -framerate %zu -i .artc/frame%%04d.ppm -pix_fmt yuv420p %s", fps, output);
         system(command);
     } else if(strcmp(format, "gif") == 0) {
         system("ffmpeg -v quiet -framerate 30 -i .artc/frame%04d.ppm -filter_complex \"[0:v] palettegen\" .artc/palette.png");
-        snprintf(command, 256, "ffmpeg -v quiet -framerate 30 -i .artc/frame%%04d.ppm -i .artc/palette.png -filter_complex \"[0:v][1:v] paletteuse\" %s", output);
+        snprintf(command, 256, "ffmpeg -v quiet -framerate %zu -i .artc/frame%%04d.ppm -i .artc/palette.png -filter_complex \"[0:v][1:v] paletteuse\" %s", fps, output);
         system(command);
     }
 

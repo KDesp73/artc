@@ -320,6 +320,20 @@ int lua_set_seed(lua_State* L)
     return 0;
 }
 
+int lua_set_fps(lua_State* L)
+{
+    if (!lua_isnumber(L, 1)) {
+        return luaL_error(L, "Expected a number as fps");
+    }
+
+    unsigned int fps = (unsigned int)lua_tointeger(L, 1);
+
+    view.fps = fps;
+
+    return 0;
+}
+
+
 Scene SceneLoadLua(const char* filename)
 {
     memset(&scene, 0, sizeof(Scene));
