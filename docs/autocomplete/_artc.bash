@@ -14,6 +14,7 @@ _artc () {
     declare -a literals=(--help gif --format mp4 -o -v -F --version --export --output -h -x gif mp4)
     declare -A literal_transitions=()
     literal_transitions[1]="([0]=3 [9]=2 [7]=3 [11]=3 [10]=3 [2]=4 [4]=2 [5]=3 [6]=5 [8]=3)"
+    literal_transitions[3]="([0]=3 [9]=2 [7]=3 [11]=3 [10]=3 [2]=4 [4]=2 [5]=3 [6]=5 [8]=3)"
     literal_transitions[4]="([12]=3 [13]=3)"
     literal_transitions[5]="([12]=3 [13]=3)"
     declare -A match_anything_transitions=([2]=3 [0]=1)
@@ -53,8 +54,8 @@ _artc () {
         return 1
     done
 
-    declare -A literal_transitions_level_0=([1]="11 10 4 5 6" [5]="12 13")
-    declare -A literal_transitions_level_1=([1]="0 9 7 2 8" [4]="12 13")
+    declare -A literal_transitions_level_0=([1]="11 10 4 5 6" [5]="12 13" [3]="11 10 4 5 6")
+    declare -A literal_transitions_level_1=([1]="0 9 7 2 8" [4]="12 13" [3]="0 9 7 2 8")
     declare -A subword_transitions_level_0=()
     declare -A subword_transitions_level_1=()
     declare -A commands_level_0=()

@@ -1,4 +1,4 @@
-artc <PATH> [<OPTIONS>];
+artc <PATH> <OPTIONS>...;
 
 
 <OPTIONS> ::= (-h || --help) "Prints the help message"

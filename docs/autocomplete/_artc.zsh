@@ -16,6 +16,7 @@ _artc () {
 
     local -A literal_transitions
     literal_transitions[2]="([1]=4 [10]=3 [8]=4 [12]=4 [11]=4 [3]=5 [5]=3 [6]=4 [7]=6 [9]=4)"
+    literal_transitions[4]="([1]=4 [10]=3 [8]=4 [12]=4 [11]=4 [3]=5 [5]=3 [6]=4 [7]=6 [9]=4)"
     literal_transitions[5]="([13]=4 [14]=4)"
     literal_transitions[6]="([13]=4 [14]=4)"
 
@@ -56,8 +57,8 @@ _artc () {
 
         return 1
     done
-    declare -A literal_transitions_level_0=([2]="12 11 5 6 7" [6]="13 14")
-    declare -A literal_transitions_level_1=([2]="1 10 8 3 9" [5]="13 14")
+    declare -A literal_transitions_level_0=([2]="12 11 5 6 7" [6]="13 14" [4]="12 11 5 6 7")
+    declare -A literal_transitions_level_1=([2]="1 10 8 3 9" [5]="13 14" [4]="1 10 8 3 9")
     declare -A subword_transitions_level_0=()
     declare -A subword_transitions_level_1=()
     declare -A commands_level_0=()

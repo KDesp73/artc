@@ -25,6 +25,7 @@ function _artc
 
     set literal_transitions
     set literal_transitions[2] "set inputs 1 10 8 12 11 3 5 6 7 9; set tos 4 3 4 4 4 5 3 4 6 4"
+    set literal_transitions[4] "set inputs 1 10 8 12 11 3 5 6 7 9; set tos 4 3 4 4 4 5 3 4 6 4"
     set literal_transitions[5] "set inputs 13 14; set tos 4 4"
     set literal_transitions[6] "set inputs 13 14; set tos 4 4"
 
