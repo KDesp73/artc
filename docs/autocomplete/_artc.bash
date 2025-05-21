@@ -11,12 +11,12 @@ _artc () {
     local words cword
     _get_comp_words_by_ref -n "$COMP_WORDBREAKS" words cword
 
-    declare -a literals=(--help gif --format mp4 -o -v -F --version --export --output -h -x gif mp4)
+    declare -a literals=(--help gif --ascii --format mp4 -o -v -F --version --export --output -h -x gif -A mp4)
     declare -A literal_transitions=()
-    literal_transitions[1]="([0]=3 [9]=2 [7]=3 [11]=3 [10]=3 [2]=4 [4]=2 [5]=3 [6]=5 [8]=3)"
-    literal_transitions[3]="([0]=3 [9]=2 [7]=3 [11]=3 [10]=3 [2]=4 [4]=2 [5]=3 [6]=5 [8]=3)"
-    literal_transitions[4]="([12]=3 [13]=3)"
-    literal_transitions[5]="([12]=3 [13]=3)"
+    literal_transitions[1]="([0]=3 [10]=2 [8]=3 [11]=3 [2]=3 [3]=4 [5]=2 [12]=3 [14]=3 [6]=3 [7]=5 [9]=3)"
+    literal_transitions[3]="([0]=3 [10]=2 [8]=3 [11]=3 [2]=3 [3]=4 [5]=2 [12]=3 [14]=3 [6]=3 [7]=5 [9]=3)"
+    literal_transitions[4]="([13]=3 [15]=3)"
+    literal_transitions[5]="([13]=3 [15]=3)"
     declare -A match_anything_transitions=([2]=3 [0]=1)
     declare -A subword_transitions
 
@@ -54,8 +54,8 @@ _artc () {
         return 1
     done
 
-    declare -A literal_transitions_level_0=([1]="11 10 4 5 6" [5]="12 13" [3]="11 10 4 5 6")
-    declare -A literal_transitions_level_1=([1]="0 9 7 2 8" [4]="12 13" [3]="0 9 7 2 8")
+    declare -A literal_transitions_level_0=([1]="11 5 12 14 6 7" [5]="13 15" [3]="11 5 12 14 6 7")
+    declare -A literal_transitions_level_1=([1]="0 10 8 2 3 9" [4]="13 15" [3]="0 10 8 2 3 9")
     declare -A subword_transitions_level_0=()
     declare -A subword_transitions_level_1=()
     declare -A commands_level_0=()

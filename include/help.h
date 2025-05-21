@@ -14,7 +14,7 @@
         printf("%s\n", ANSI_RESET); \
     } while(0)
 
-static void help()
+static inline void help()
 {
     PB("USAGE");
     PI("artc <FILE> [<OPTIONS>...]");
@@ -26,6 +26,7 @@ static void help()
     PI("-x --export        Export the render in a media file");
     PI("-F --format <FMT>  Specify the format of the exported file");
     PI("-o --output <PATH> Specify a different output path");
+    PI("-A --ascii         Render visuals in the terminal");
     printf("\n");
     
     printf("%sWritten by KDesp73%s\n", ANSI_ITALIC, ANSI_RESET);

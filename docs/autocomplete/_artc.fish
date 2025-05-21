@@ -14,20 +14,21 @@ function _artc
         set COMP_CWORD (count $COMP_WORDS)
     end
 
-    set literals "--help" "gif" "--format" "mp4" "-o" "-v" "-F" "--version" "--export" "--output" "-h" "-x" "gif" "mp4"
+    set literals "--help" "gif" "--ascii" "--format" "mp4" "-o" "-v" "-F" "--version" "--export" "--output" "-h" "-x" "gif" "-A" "mp4"
 
     set descriptions
-    set descriptions[5] "Specify a different output path"
-    set descriptions[6] "Prints the current version and exits"
-    set descriptions[7] "Specify the format of the exported file"
-    set descriptions[11] "Prints the help message"
-    set descriptions[12] "Export the render in a media file"
+    set descriptions[6] "Specify a different output path"
+    set descriptions[7] "Prints the current version and exits"
+    set descriptions[8] "Specify the format of the exported file"
+    set descriptions[12] "Prints the help message"
+    set descriptions[13] "Export the render in a media file"
+    set descriptions[15] "Render visuals in the terminal"
 
     set literal_transitions
-    set literal_transitions[2] "set inputs 1 10 8 12 11 3 5 6 7 9; set tos 4 3 4 4 4 5 3 4 6 4"
-    set literal_transitions[4] "set inputs 1 10 8 12 11 3 5 6 7 9; set tos 4 3 4 4 4 5 3 4 6 4"
-    set literal_transitions[5] "set inputs 13 14; set tos 4 4"
-    set literal_transitions[6] "set inputs 13 14; set tos 4 4"
+    set literal_transitions[2] "set inputs 1 11 9 12 3 4 6 13 15 7 8 10; set tos 4 3 4 4 4 5 3 4 4 4 6 4"
+    set literal_transitions[4] "set inputs 1 11 9 12 3 4 6 13 15 7 8 10; set tos 4 3 4 4 4 5 3 4 4 4 6 4"
+    set literal_transitions[5] "set inputs 14 16; set tos 4 4"
+    set literal_transitions[6] "set inputs 14 16; set tos 4 4"
 
     set match_anything_transitions_from 3 1
     set match_anything_transitions_to 4 2

@@ -5,20 +5,21 @@ _artc_cmd_0 () {
 }
 
 _artc () {
-    local -a literals=("--help" "gif" "--format" "mp4" "-o" "-v" "-F" "--version" "--export" "--output" "-h" "-x" "gif" "mp4")
+    local -a literals=("--help" "gif" "--ascii" "--format" "mp4" "-o" "-v" "-F" "--version" "--export" "--output" "-h" "-x" "gif" "-A" "mp4")
 
     local -A descriptions
-    descriptions[5]="Specify a different output path"
-    descriptions[6]="Prints the current version and exits"
-    descriptions[7]="Specify the format of the exported file"
-    descriptions[11]="Prints the help message"
-    descriptions[12]="Export the render in a media file"
+    descriptions[6]="Specify a different output path"
+    descriptions[7]="Prints the current version and exits"
+    descriptions[8]="Specify the format of the exported file"
+    descriptions[12]="Prints the help message"
+    descriptions[13]="Export the render in a media file"
+    descriptions[15]="Render visuals in the terminal"
 
     local -A literal_transitions
-    literal_transitions[2]="([1]=4 [10]=3 [8]=4 [12]=4 [11]=4 [3]=5 [5]=3 [6]=4 [7]=6 [9]=4)"
-    literal_transitions[4]="([1]=4 [10]=3 [8]=4 [12]=4 [11]=4 [3]=5 [5]=3 [6]=4 [7]=6 [9]=4)"
-    literal_transitions[5]="([13]=4 [14]=4)"
-    literal_transitions[6]="([13]=4 [14]=4)"
+    literal_transitions[2]="([1]=4 [11]=3 [9]=4 [12]=4 [3]=4 [4]=5 [6]=3 [13]=4 [15]=4 [7]=4 [8]=6 [10]=4)"
+    literal_transitions[4]="([1]=4 [11]=3 [9]=4 [12]=4 [3]=4 [4]=5 [6]=3 [13]=4 [15]=4 [7]=4 [8]=6 [10]=4)"
+    literal_transitions[5]="([14]=4 [16]=4)"
+    literal_transitions[6]="([14]=4 [16]=4)"
 
     local -A match_anything_transitions
     match_anything_transitions=([3]=4 [1]=2)
@@ -57,8 +58,8 @@ _artc () {
 
         return 1
     done
-    declare -A literal_transitions_level_0=([2]="12 11 5 6 7" [6]="13 14" [4]="12 11 5 6 7")
-    declare -A literal_transitions_level_1=([2]="1 10 8 3 9" [5]="13 14" [4]="1 10 8 3 9")
+    declare -A literal_transitions_level_0=([2]="12 6 13 15 7 8" [6]="14 16" [4]="12 6 13 15 7 8")
+    declare -A literal_transitions_level_1=([2]="1 11 9 3 4 10" [5]="14 16" [4]="1 11 9 3 4 10")
     declare -A subword_transitions_level_0=()
     declare -A subword_transitions_level_1=()
     declare -A commands_level_0=()

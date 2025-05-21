@@ -6,6 +6,7 @@ artc <PATH> <OPTIONS>...;
             | (-x || --export) "Export the render in a media file"
             | (-F <FMT> || --format <FMT>) "Specify the format of the exported file"
             | (-o <PATH> || --output <PATH>) "Specify a different output path"
+            | (-A || --ascii) "Render visuals in the terminal"
 			;
 
 <FMT> ::= (mp4 | gif);
