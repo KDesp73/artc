@@ -85,7 +85,8 @@ sudo make install
 #### Dependencies
 
 - gcc
-- FFmpeg installed and accessible 
+- SDL2
+- FFmpeg
 
 ## 🧠 Scripting API
 
