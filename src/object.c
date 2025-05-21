@@ -82,6 +82,23 @@ void ObjectPaint(ArtObject* o, View* view)
                 }
             }
         }
+    } else if (o->type == OBJECT_TRIANGLE) {
+        int cx = (int)o->x;
+        int cy = (int)o->y;
+        int size = (int)o->size;
+        Uint32* pixels = (Uint32*)view->surface->pixels;
+        int pitch = view->surface->pitch / 4;
+
+        for (int y = 0; y < size; y++) {
+            int start_x = cx - y / 2;
+            int end_x = cx + y / 2;
+            int py = cy + y;
+            for (int px = start_x; px <= end_x; px++) {
+                if (px >= 0 && px < view->width && py >= 0 && py < view->height) {
+                    pixels[py * pitch + px] = color;
+                }
+            }
+        }
     }
 }
 
@@ -106,10 +123,19 @@ char* object_type_to_string(ObjectType obj)
     switch (obj) {
         case OBJECT_SQUARE: return "square";
         case OBJECT_CIRCLE: return "circle";
+        case OBJECT_TRIANGLE: return "triangle";
         case OBJECT_NONE:
         default:
             return "none";
     }
+}
+
+ObjectType parse_object_type(const char* str)
+{
+    if(!strcmp(str, object_type_to_string(OBJECT_CIRCLE))) return OBJECT_CIRCLE;
+    if(!strcmp(str, object_type_to_string(OBJECT_TRIANGLE))) return OBJECT_TRIANGLE;
+    if(!strcmp(str, object_type_to_string(OBJECT_SQUARE))) return OBJECT_SQUARE;
+    return OBJECT_NONE;
 }
 
 void ObjectPrint(ArtObject* o)
@@ -119,7 +145,7 @@ void ObjectPrint(ArtObject* o)
         return;
     }
 
-    printf("ArtObject id=%d type=%d\n", o->id, o->type);
+    printf("ArtObject id=%d type=%s\n", o->id, object_type_to_string(o->type));
     printf("  Position: (%.2f, %.2f)\n", o->x, o->y);
     printf("  Size: %.2f\n", o->size);
     printf("  Color: R=%d G=%d B=%d\n", o->color.r, o->color.g, o->color.b);

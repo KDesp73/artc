@@ -11,12 +11,20 @@ function bg(hex) end
 function window(width, height) end
 
 --- Create a circle object
+-- @param opts table: {x, y, size, type, color, motion, speed, radius}
+function object(opts) end
+
+--- Create a circle object
 -- @param opts table: {x, y, size, color, motion, speed, radius}
 function circle(opts) end
 
 --- Create a square object
 -- @param opts table: {x, y, size, color, motion, speed, radius}
 function square(opts) end
+
+--- Create a triangle object
+-- @param opts table: {x, y, size, color, motion, speed, radius}
+function triangle(opts) end
 
 --- Get elapsed time in milliseconds
 -- @return number

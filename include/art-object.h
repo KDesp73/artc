@@ -20,9 +20,11 @@ char* motion_to_string(MotionType motion);
 typedef enum {
     OBJECT_NONE = -1,
     OBJECT_SQUARE,
-    OBJECT_CIRCLE
+    OBJECT_CIRCLE,
+    OBJECT_TRIANGLE,
 } ObjectType;
 char* object_type_to_string(ObjectType obj);
+ObjectType parse_object_type(const char* str);
 
 typedef struct {
     int id;

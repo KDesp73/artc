@@ -1,7 +1,21 @@
 #include "export.h"
 #include <SDL2/SDL_render.h>
 
-void save_frame_ppm(const char* filename, int width, int height, SDL_Surface* surface)
+void Export(const char* format, const char* output)
+{
+    char command[256];
+    if(strcmp(format, "mp4") == 0) {
+        snprintf(command, 256, "ffmpeg -v quiet -framerate 30 -i .artc/frame%%04d.ppm -pix_fmt yuv420p %s", output);
+        system(command);
+    } else if(strcmp(format, "gif") == 0) {
+        system("ffmpeg -v quiet -framerate 30 -i .artc/frame%04d.ppm -filter_complex \"[0:v] palettegen\" .artc/palette.png");
+        snprintf(command, 256, "ffmpeg -v quiet -framerate 30 -i .artc/frame%%04d.ppm -i .artc/palette.png -filter_complex \"[0:v][1:v] paletteuse\" %s", output);
+        system(command);
+    }
+
+}
+
+void SaveFrameToPPM(const char* filename, int width, int height, SDL_Surface* surface)
 {
     FILE* f = fopen(filename, "wb");
     if (!f) return;

@@ -10,8 +10,78 @@
 #include "view.h"
 
 extern Scene scene;
+int lua_create_object(lua_State* L)
+{
+    if (!lua_istable(L, 1))
+        return luaL_error(L, "Expected a table");
 
-static int lua_create_object(lua_State* L, ObjectType type)
+    if (scene.count >= MAX_OBJECTS)
+        return luaL_error(L, "Maximum number of objects reached");
+
+    ArtObject* obj = &scene.objects[scene.count++];
+
+    obj->id = scene.next_id++;
+
+    // x (default 0)
+    lua_getfield(L, 1, "x");
+    obj->x = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    // y (default 0)
+    lua_getfield(L, 1, "y");
+    obj->y = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    // size (default 10)
+    lua_getfield(L, 1, "size");
+    obj->size = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 10.0f;
+    lua_pop(L, 1);
+
+    // color (default white)
+    lua_getfield(L, 1, "color");
+    if (lua_isstring(L, -1)) {
+        obj->color = parse_color(lua_tostring(L, -1));
+    } else {
+        obj->color = parse_color("#ffffff");
+    }
+    lua_pop(L, 1);
+
+    lua_getfield(L, 1, "type");
+    if (lua_isstring(L, -1)) {
+        obj->type = parse_object_type(lua_tostring(L, -1));
+    } else {
+        obj->type = OBJECT_SQUARE;
+    }
+    lua_pop(L, 1);
+
+    // motion (default MOTION_STATIC)
+    lua_getfield(L, 1, "motion");
+    if (lua_isstring(L, -1)) {
+        obj->motion = parse_motion(lua_tostring(L, -1));
+    } else {
+        obj->motion = MOTION_STATIC;
+    }
+    lua_pop(L, 1);
+
+    // speed (default 0)
+    lua_getfield(L, 1, "speed");
+    obj->speed = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    // radius (default 0)
+    lua_getfield(L, 1, "radius");
+    obj->radius = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    obj->cx = obj->x;
+    obj->cy = obj->y;
+
+    lua_pushinteger(L, obj->id);
+    return 1;
+
+}
+
+static int create_object(lua_State* L, ObjectType type)
 {
     if (!lua_istable(L, 1))
         return luaL_error(L, "Expected a table");
@@ -44,7 +114,7 @@ static int lua_create_object(lua_State* L, ObjectType type)
     if (lua_isstring(L, -1)) {
         obj->color = parse_color(lua_tostring(L, -1));
     } else {
-        obj->color = parse_color("white");  // or your default color string
+        obj->color = parse_color("#ffffff");
     }
     lua_pop(L, 1);
 
@@ -76,12 +146,17 @@ static int lua_create_object(lua_State* L, ObjectType type)
 
 int lua_create_circle(lua_State* L) 
 {
-    return lua_create_object(L, OBJECT_CIRCLE);
+    return create_object(L, OBJECT_CIRCLE);
 }
 
 int lua_create_square(lua_State* L)
 {
-    return lua_create_object(L, OBJECT_SQUARE);
+    return create_object(L, OBJECT_SQUARE);
+}
+
+int lua_create_triangle(lua_State* L)
+{
+    return create_object(L, OBJECT_TRIANGLE);
 }
 
 int lua_set_background(lua_State* L)
@@ -219,6 +294,13 @@ int lua_modify_object(lua_State* L)
     if (lua_isstring(L, -1)) {
         const char* color_str = lua_tostring(L, -1);
         obj->color = parse_color(color_str);
+    }
+    lua_pop(L, 1);
+
+    lua_getfield(L, 2, "type");
+    if (lua_isstring(L, -1)) {
+        const char* type_str = lua_tostring(L, -1);
+        obj->type = parse_object_type(type_str);
     }
     lua_pop(L, 1);
 
