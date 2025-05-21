@@ -10,6 +10,3 @@ artc
 libartc.a
 libartc.so
 *.ppm
-*.mp4
-*.gif
-*.png
