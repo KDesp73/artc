@@ -14,8 +14,6 @@ int lua_clear_scene(lua_State* L);
 int lua_modify_object(lua_State* L);
 int lua_set_seed(lua_State* L);
 
-void register_artobject(lua_State* L);
-
 static inline void setup_lua(lua_State* L)
 {
     lua_register(L, "circle", lua_create_circle);
@@ -28,7 +26,6 @@ static inline void setup_lua(lua_State* L)
     lua_register(L, "clear", lua_clear_scene);
     lua_register(L, "modify", lua_modify_object);
     lua_register(L, "seed", lua_set_seed);
-    register_artobject(L);
 }
 
 #endif // ARTC_LUA_H

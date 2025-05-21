@@ -78,3 +78,20 @@ char* object_type_to_string(ObjectType obj)
             return "none";
     }
 }
+
+void ObjectPrint(ArtObject* o)
+{
+    if (!o) {
+        printf("Object is NULL\n");
+        return;
+    }
+
+    printf("ArtObject id=%d type=%d\n", o->id, o->type);
+    printf("  Position: (%.2f, %.2f)\n", o->x, o->y);
+    printf("  Size: %.2f\n", o->size);
+    printf("  Color: R=%d G=%d B=%d\n", o->color.r, o->color.g, o->color.b);
+    printf("  Motion: %d\n", o->motion);
+    printf("  Speed: %.2f\n", o->speed);
+    printf("  Radius: %.2f\n", o->radius);
+    printf("  Center: (%.2f, %.2f)\n", o->cx, o->cy);
+}

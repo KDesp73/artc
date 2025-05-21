@@ -10,16 +10,18 @@ function setup()
             x = 0,
             y = 0,
             size = 10,
-            color = "#ffffff",
+            color = "#ff0000",
             motion = "none",
             speed = 0,
             radius = 20
         })
         table.insert(ids, id)
     end
+
+    -- update()
 end
 
-function update()
+function update(dt)
     local t = time() * 0.001
 
     for i = 1, #ids do
@@ -31,6 +33,7 @@ function update()
         local g = 127 + math.sin(t + i + 2) * 127
         local b = 127 + math.sin(t + i + 4) * 127
 
+        print(ids[i])
         modify(ids[i], {
             x = x,
             y = y,

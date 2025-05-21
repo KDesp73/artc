@@ -38,5 +38,6 @@ typedef struct {
 
 void ObjectUpdate(ArtObject* o, float time);
 void ObjectPaint(ArtObject* o, View* view);
+void ObjectPrint(ArtObject* o);
 
 #endif // ART_OBJECT_H

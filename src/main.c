@@ -28,6 +28,7 @@ static bool validate_format(char* fmt)
 }
 
 View view = {0};
+Scene scene = {0};
 int main(int argc, char** argv)
 {
     int maj, min, pat;
@@ -89,7 +90,7 @@ int main(int argc, char** argv)
     }
     char* output = swap_ext(file, format);
 
-    Scene scene = SceneLoad(file);
+    scene = SceneLoad(file);
     if(!scene.loaded) {
         ERRO("Could not load scene");
         return 1;
@@ -132,11 +133,12 @@ int main(int argc, char** argv)
         if (lua_isfunction(view.L, -1)) {
             lua_pushnumber(view.L, delta_time);
             if (lua_pcall(view.L, 1, 0, 0) != LUA_OK) {
-                fprintf(stderr, "Lua update error: %s\n", lua_tostring(view.L, -1));
+                ERRO("Lua update error: %s", lua_tostring(view.L, -1));
                 lua_pop(view.L, 1);
+                return 1;
             }
         } else {
-            lua_pop(view.L, 1); // not a function, pop
+            lua_pop(view.L, 1);
         }
 
         for (int i = 0; i < scene.count; i++) {
@@ -144,6 +146,7 @@ int main(int argc, char** argv)
             ObjectUpdate(o, t);
             ObjectPaint(o, &view);
         }
+        // ObjectPrint(&scene.objects[0]);
 
         SDL_UpdateTexture(view.texture, NULL, view.surface->pixels, view.surface->pitch);
         SDL_RenderClear(view.renderer);

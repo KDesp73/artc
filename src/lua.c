@@ -1,4 +1,5 @@
 #include "lua/lua.h"
+#include "art-object.h"
 #include "io/logging.h"
 #include "lua/lauxlib.h"
 #include "lua/lualib.h"
@@ -8,7 +9,7 @@
 #include "scene.h"
 #include "view.h"
 
-static Scene scene;
+extern Scene scene;
 
 static int lua_create_object(lua_State* L, ObjectType type)
 {
@@ -162,146 +163,6 @@ int lua_clear_scene(lua_State* L)
     return 0;
 }
 
-static void push_color_table(lua_State* L, SDL_Color c)
-{
-    lua_newtable(L);
-    lua_pushinteger(L, c.r);
-    lua_setfield(L, -2, "r");
-    lua_pushinteger(L, c.g);
-    lua_setfield(L, -2, "g");
-    lua_pushinteger(L, c.b);
-    lua_setfield(L, -2, "b");
-    lua_pushinteger(L, c.a);
-    lua_setfield(L, -2, "a");
-}
-
-// Helper: read color table from Lua at index idx, set SDL_Color*
-static int read_color_table(lua_State* L, int idx, SDL_Color* c)
-{
-    if (!lua_istable(L, idx)) return 0;
-    lua_getfield(L, idx, "r");
-    c->r = (Uint8)luaL_optinteger(L, -1, c->r);
-    lua_pop(L, 1);
-    lua_getfield(L, idx, "g");
-    c->g = (Uint8)luaL_optinteger(L, -1, c->g);
-    lua_pop(L, 1);
-    lua_getfield(L, idx, "b");
-    c->b = (Uint8)luaL_optinteger(L, -1, c->b);
-    lua_pop(L, 1);
-    lua_getfield(L, idx, "a");
-    c->a = (Uint8)luaL_optinteger(L, -1, 255);
-    lua_pop(L, 1);
-    return 1;
-}
-
-// Metamethod __index for ArtObject userdata
-static int artobject_index(lua_State* L)
-{
-    ArtObject* obj = (ArtObject*)luaL_checkudata(L, 1, "ArtObjectMT");
-    const char* key = luaL_checkstring(L, 2);
-
-    if (strcmp(key, "x") == 0)
-        lua_pushnumber(L, obj->x);
-    else if (strcmp(key, "y") == 0)
-        lua_pushnumber(L, obj->y);
-    else if (strcmp(key, "cx") == 0)
-        lua_pushnumber(L, obj->cx);
-    else if (strcmp(key, "cy") == 0)
-        lua_pushnumber(L, obj->cy);
-    else if (strcmp(key, "size") == 0)
-        lua_pushnumber(L, obj->size);
-    else if (strcmp(key, "color") == 0)
-        push_color_table(L, obj->color);
-    else if (strcmp(key, "motion") == 0)
-        lua_pushstring(L, motion_to_string(obj->motion));
-    else if (strcmp(key, "type") == 0)
-        lua_pushstring(L, object_type_to_string(obj->type));
-    else if (strcmp(key, "speed") == 0)
-        lua_pushnumber(L, obj->speed);
-    else if (strcmp(key, "radius") == 0)
-        lua_pushnumber(L, obj->radius);
-    else
-        lua_pushnil(L);
-
-    return 1;
-}
-
-// Metamethod __newindex for ArtObject userdata
-static int artobject_newindex(lua_State* L) {
-    ArtObject* obj = (ArtObject*)luaL_checkudata(L, 1, "ArtObjectMT");
-    const char* key = luaL_checkstring(L, 2);
-
-    if (strcmp(key, "x") == 0)
-        obj->x = (float)luaL_checknumber(L, 3);
-    else if (strcmp(key, "y") == 0)
-        obj->y = (float)luaL_checknumber(L, 3);
-    else if (strcmp(key, "cx") == 0)
-        obj->cx = (float)luaL_checknumber(L, 3);
-    else if (strcmp(key, "cy") == 0)
-        obj->cy = (float)luaL_checknumber(L, 3);
-    else if (strcmp(key, "size") == 0)
-        obj->size = (float)luaL_checknumber(L, 3);
-    else if (strcmp(key, "color") == 0) {
-        if (!read_color_table(L, 3, &obj->color)) {
-            return luaL_error(L, "color must be a table with r,g,b[,a]");
-        }
-    }
-    else if (strcmp(key, "motion") == 0) {
-        const char* mstr = luaL_checkstring(L, 3);
-        obj->motion = parse_motion(mstr); // your motion parser
-    }
-    else if (strcmp(key, "speed") == 0)
-        obj->speed = (float)luaL_checknumber(L, 3);
-    else if (strcmp(key, "radius") == 0)
-        obj->radius = (float)luaL_checknumber(L, 3);
-    else {
-        return luaL_error(L, "Attempt to set invalid property '%s'", key);
-    }
-
-    return 0;
-}
-
-// Lua function to get object userdata by index
-int lua_get_object(lua_State* L) {
-    int index = luaL_checkinteger(L, 1);
-    if (index < 1 || index > scene.count) {
-        lua_pushnil(L);
-        return 1;
-    }
-
-    ArtObject* obj = &scene.objects[index - 1];
-
-    // Create userdata wrapping the ArtObject pointer
-    ArtObject** udata = (ArtObject**)lua_newuserdata(L, sizeof(ArtObject*));
-    *udata = obj;
-
-    // Set metatable
-    luaL_getmetatable(L, "ArtObjectMT");
-    lua_setmetatable(L, -2);
-
-    return 1; // userdata on stack
-}
-
-// Call this once to register metatable & function
-void register_artobject(lua_State* L)
-{
-    // Create metatable
-    luaL_newmetatable(L, "ArtObjectMT");
-
-    // Set __index
-    lua_pushcfunction(L, artobject_index);
-    lua_setfield(L, -2, "__index");
-
-    // Set __newindex
-    lua_pushcfunction(L, artobject_newindex);
-    lua_setfield(L, -2, "__newindex");
-
-    lua_pop(L, 1); // pop metatable
-
-    // Register global function
-    lua_register(L, "get_object", lua_get_object);
-}
-
 static ArtObject* find_object_by_id(int id) {
     for (int i = 0; i < scene.count; i++) {
         if (scene.objects[i].id == id)
@@ -323,6 +184,9 @@ int lua_modify_object(lua_State* L)
     }
 
     ArtObject* obj = find_object_by_id(id);
+    if(obj == NULL) {
+        return luaL_error(L, "Could not find object with id: %d", id);
+    }
 
     lua_getfield(L, 2, "x");
     if (lua_isnumber(L, -1)) obj->x = lua_tonumber(L, -1);
@@ -403,10 +267,12 @@ Scene SceneLoadLua(const char* filename)
         if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
             ERRO("Lua setup() error: %s", lua_tostring(L, -1));
             lua_pop(L, 1);
+            return scene;
         }
     } else {
         ERRO("Lua error: no 'setup' function defined");
         lua_pop(L, 1);
+        return scene;
     }
 
     view.L = L;
