@@ -75,7 +75,7 @@ artc script.lua -x -F gif  # Export as GIF
 ### From source
 
 ```sh
-git clone https://github.com/yourname/artc.git
+git clone https://github.com/KDesp73/artc
 cd artc
 make
 sudo make install
