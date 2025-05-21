@@ -3,7 +3,7 @@
 
 #include "art-object.h"
 
-#define MAX_OBJECTS 256
+#define MAX_OBJECTS 512
 
 typedef struct {
     int width;
