@@ -93,6 +93,7 @@ int main(int argc, char** argv)
         ERRO("The file must have an .art or a .lua extension");
         return 1;
     }
+    bool is_art = strstr(file, ".art");
     output = (output) ? output : swap_ext(file, format);
 
     scene = SceneLoad(file);
@@ -133,16 +134,18 @@ int main(int argc, char** argv)
                     scene.options.background.g,
                     scene.options.background.b, 255));
 
-        lua_getglobal(view.L, "update");
-        if (lua_isfunction(view.L, -1)) {
-            lua_pushnumber(view.L, delta_time);
-            if (lua_pcall(view.L, 1, 0, 0) != LUA_OK) {
-                ERRO("Lua update error: %s", lua_tostring(view.L, -1));
+        if(!is_art){
+            lua_getglobal(view.L, "update");
+            if (lua_isfunction(view.L, -1)) {
+                lua_pushnumber(view.L, delta_time);
+                if (lua_pcall(view.L, 1, 0, 0) != LUA_OK) {
+                    ERRO("Lua update error: %s", lua_tostring(view.L, -1));
+                    lua_pop(view.L, 1);
+                    return 1;
+                }
+            } else {
                 lua_pop(view.L, 1);
-                return 1;
             }
-        } else {
-            lua_pop(view.L, 1);
         }
 
         for (int i = 0; i < scene.count; i++) {
