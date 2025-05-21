@@ -20,6 +20,8 @@ typedef struct {
 
 bool ViewInit(View* view);
 void ViewFree(View* view);
+void ViewRender(View* view);
+void ViewRenderAscii(View* view);
 
 extern View view;
 

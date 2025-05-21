@@ -1,3 +1,4 @@
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -5,6 +6,7 @@
 #include "export.h"
 #include "files.h"
 #include "help.h"
+#include "io/ansi.h"
 #include "lua/lua.h"
 #include "scene.h"
 #include "view.h"
@@ -27,10 +29,19 @@ static bool validate_format(char* fmt)
     return false;
 }
 
+static volatile int keep_running = 1;
+void handle_sigint(int sig) {
+    (void)sig;
+
+    ANSI_SHOW_CURSOR();
+    keep_running = 0;
+}
+
 View view = {0};
 Scene scene = {0};
 int main(int argc, char** argv)
 {
+    signal(SIGINT, handle_sigint);
     int maj, min, pat;
     version(&maj, &min, &pat);
 
@@ -40,6 +51,7 @@ int main(int argc, char** argv)
         cli_arg_new('x', "export", "", no_argument),
         cli_arg_new('F', "format", "", required_argument),
         cli_arg_new('o', "output", "", required_argument),
+        cli_arg_new('A', "ascii", "", no_argument),
         NULL
     );
 
@@ -47,6 +59,7 @@ int main(int argc, char** argv)
     bool export = false;
     char* format = "mp4";
     char* output = NULL;
+    bool ascii = false;
 
     int opt;
     LOOP_ARGS(opt, args) {
@@ -71,12 +84,16 @@ int main(int argc, char** argv)
             case 'o':
                 output = optarg;
                 break;
+            case 'A':
+                ascii = true;
+                break;
             default:
                 exit(1);
         }
     }
     cli_args_free(&args);
-    printf("artc v%d.%d.%d\n", maj, min, pat);
+
+    if(ascii){ export = false; }
 
     if(dir_exists(".artc")) {
         dir_remove(".artc");
@@ -113,7 +130,7 @@ int main(int argc, char** argv)
     const int target_fps = 30;
     const int frame_delay = 1000 / target_fps;
     Uint32 prev_time = SDL_GetTicks();
-    while (running) {
+    while (running && keep_running) {
         Uint32 frame_start = SDL_GetTicks();
         float delta_time = (frame_start - prev_time) / 1000.0f;
         prev_time = frame_start; 
@@ -153,12 +170,11 @@ int main(int argc, char** argv)
             ObjectUpdate(o, t);
             ObjectPaint(o, &view);
         }
-        // ObjectPrint(&scene.objects[0]);
 
-        SDL_UpdateTexture(view.texture, NULL, view.surface->pixels, view.surface->pitch);
-        SDL_RenderClear(view.renderer);
-        SDL_RenderCopy(view.renderer, view.texture, NULL, NULL);
-        SDL_RenderPresent(view.renderer);
+        if(ascii)
+            ViewRenderAscii(&view);
+        else
+            ViewRender(&view);
 
         if(export) {
             // Save frame to PPM
