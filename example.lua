@@ -1,4 +1,4 @@
-window(1080, 720)
+window(640, 480)
 bg("#000000")
 seed(73)
 
@@ -17,8 +17,6 @@ function setup()
         })
         table.insert(ids, id)
     end
-
-    -- update()
 end
 
 function update(dt)
@@ -33,7 +31,6 @@ function update(dt)
         local g = 127 + math.sin(t + i + 2) * 127
         local b = 127 + math.sin(t + i + 4) * 127
 
-        print(ids[i])
         modify(ids[i], {
             x = x,
             y = y,
