@@ -1,0 +1,13 @@
+artc <PATH> [<OPTIONS>];
+
+
+<OPTIONS> ::= (-h || --help) "Prints the help message"
+			| (-v || --version) "Prints the current version and exits"
+            | (-x || --export) "Export the render in a media file"
+            | (-F <FMT> || --format <FMT>) "Specify the format of the exported file"
+            | (-o <PATH> || --output <PATH>) "Specify a different output path"
+			;
+
+<FMT> ::= (mp4 | gif);
+
+

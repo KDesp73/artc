@@ -25,6 +25,7 @@ static void help()
     PI("-v --version       Prints the current version and exits");
     PI("-x --export        Export the render in a media file");
     PI("-F --format <FMT>  Specify the format of the exported file");
+    PI("-o --output <PATH> Specify a different output path");
     printf("\n");
     
     printf("%sWritten by KDesp73%s\n", ANSI_ITALIC, ANSI_RESET);

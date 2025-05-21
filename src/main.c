@@ -39,12 +39,14 @@ int main(int argc, char** argv)
         cli_arg_new('v', "version", "", no_argument),
         cli_arg_new('x', "export", "", no_argument),
         cli_arg_new('F', "format", "", required_argument),
+        cli_arg_new('o', "output", "", required_argument),
         NULL
     );
 
     // CLI argument values
     bool export = false;
     char* format = "mp4";
+    char* output = NULL;
 
     int opt;
     LOOP_ARGS(opt, args) {
@@ -65,6 +67,9 @@ int main(int argc, char** argv)
                     exit(1);
                 }
 
+                break;
+            case 'o':
+                output = optarg;
                 break;
             default:
                 exit(1);
@@ -88,14 +93,13 @@ int main(int argc, char** argv)
         ERRO("The file must have an .art or a .lua extension");
         return 1;
     }
-    char* output = swap_ext(file, format);
+    output = (output) ? output : swap_ext(file, format);
 
     scene = SceneLoad(file);
     if(!scene.loaded) {
         ERRO("Could not load scene");
         return 1;
     }
-    INFO("object count: %d", scene.count);
 
     view.width = scene.options.width;
     view.height = scene.options.height;

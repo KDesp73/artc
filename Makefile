@@ -106,6 +106,11 @@ compile_commands.json: $(SRC_FILES) ## Generate compile_commands.json
 	@echo "[INFO] Generating compile_commands.json"
 	bear -- make all
 
+autocomplete:
+	complgen aot ./docs/autocomplete/artc.usage --zsh-script ./docs/autocomplete/_artc.zsh
+	complgen aot ./docs/autocomplete/artc.usage --bash-script ./docs/autocomplete/_artc.bash
+	complgen aot ./docs/autocomplete/artc.usage --fish-script ./docs/autocomplete/_artc.fish
+
 .PHONY: help
 help: ## Show this help message
 	@echo "Available commands:"
