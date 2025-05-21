@@ -2,7 +2,7 @@
 CC = gcc
 INCLUDE = -Iinclude -Ideps/include
 CFLAGS = -Wall -fPIC $(INCLUDE)
-LDFLAGS = -Ldeps/lib -lSDL2 $(shell pkg-config --libs sdl2) -lm -l:liblua.a
+LDFLAGS = -Ldeps/lib -lSDL2 -lm -l:liblua.a
 
 # Directories
 SRC_DIR = src
@@ -53,8 +53,7 @@ all: check_tools $(BUILD_DIR) static shared $(TARGET)## Build the project
 
 .PHONY: check_tools
 check_tools: ## Check if necessary tools are available
-	@command -v gcc >/dev/null 2>&1 || { echo >&2 "[ERRO] gcc is not installed."; exit 1; }
-	@command -v bear >/dev/null 2>&1 || { echo >&2 "[WARN] bear is not installed. Skipping compile_commands.json target."; }
+	@bash ./scripts/check_deps.sh -q
 
 $(BUILD_DIR): ## Create the build directory if it doesn't exist
 	@echo "[INFO] Creating build directory"
@@ -106,7 +105,8 @@ compile_commands.json: $(SRC_FILES) ## Generate compile_commands.json
 	@echo "[INFO] Generating compile_commands.json"
 	bear -- make all
 
-autocomplete:
+.PHONY: autocomplete
+autocomplete: ## Generate autocomplete scripts for bash, zsh and fish shells
 	complgen aot ./docs/autocomplete/artc.usage --zsh-script ./docs/autocomplete/_artc.zsh
 	complgen aot ./docs/autocomplete/artc.usage --bash-script ./docs/autocomplete/_artc.bash
 	complgen aot ./docs/autocomplete/artc.usage --fish-script ./docs/autocomplete/_artc.fish

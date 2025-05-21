@@ -21,6 +21,7 @@ Here's a sample Lua script that animates 100 color-shifting circles in a spiral 
 ```lua
 window(640, 480)
 bg("#000000")
+fps(60)
 
 local ids = {}
 
@@ -58,6 +59,7 @@ function update(dt)
         })
     end
 end
+
 ```
 
 ![example](./assets/example.gif)

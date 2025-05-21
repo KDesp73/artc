@@ -16,12 +16,12 @@ function color.hex_to_rgb(hex)
     hex = hex:gsub("#", "")
     if #hex == 3 then
         return tonumber("0x"..hex:sub(1,1):rep(2)),
-               tonumber("0x"..hex:sub(2,2):rep(2)),
-               tonumber("0x"..hex:sub(3,3):rep(2))
+        tonumber("0x"..hex:sub(2,2):rep(2)),
+        tonumber("0x"..hex:sub(3,3):rep(2))
     elseif #hex == 6 then
         return tonumber("0x"..hex:sub(1,2)),
-               tonumber("0x"..hex:sub(3,4)),
-               tonumber("0x"..hex:sub(5,6))
+        tonumber("0x"..hex:sub(3,4)),
+        tonumber("0x"..hex:sub(5,6))
     else
         error("Invalid hex format: " .. hex)
     end
@@ -72,8 +72,8 @@ function color.hsv_to_rgb(h, s, v)
     end
 
     return math.floor((r + m) * 255),
-           math.floor((g + m) * 255),
-           math.floor((b + m) * 255)
+    math.floor((g + m) * 255),
+    math.floor((b + m) * 255)
 end
 
 -- Linear interpolation between two RGB colors
@@ -87,16 +87,15 @@ end
 -- Darken color by a factor (0.0 - 1.0)
 function color.darken(r, g, b, factor)
     return math.floor(r * factor),
-           math.floor(g * factor),
-           math.floor(b * factor)
+    math.floor(g * factor),
+    math.floor(b * factor)
 end
 
 -- Brighten color by a factor (0.0 - 1.0)
 function color.brighten(r, g, b, factor)
     return clamp(math.floor(r + (255 - r) * factor), 0, 255),
-           clamp(math.floor(g + (255 - g) * factor), 0, 255),
-           clamp(math.floor(b + (255 - b) * factor), 0, 255)
+    clamp(math.floor(g + (255 - g) * factor), 0, 255),
+    clamp(math.floor(b + (255 - b) * factor), 0, 255)
 end
 
 return color
-
