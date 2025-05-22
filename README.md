@@ -98,6 +98,12 @@ Your Lua script must define at least:
 
 Check [artc.lua](./artc.lua) for the full list of available functions
 
+## Helpers
+
+- [Artc Editor](https://artc-editor.vercel.app/)
+- [Artc Service](https://github.com/KDesp73/artc-service)
+
+
 ## 🪪 License
 
 [MIT](./LICENSE)
