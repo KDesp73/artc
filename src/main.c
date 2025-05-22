@@ -53,6 +53,7 @@ int main(int argc, char** argv)
         cli_arg_new('o', "output", "", required_argument),
         cli_arg_new('A', "ascii", "", no_argument),
         cli_arg_new('S', "no-sandbox", "", no_argument),
+        cli_arg_new('d', "duration", "", required_argument),
         NULL
     );
 
@@ -62,6 +63,7 @@ int main(int argc, char** argv)
     char* output = NULL;
     bool ascii = false;
     bool sandbox = true;
+    size_t durations_s = 0;
 
     int opt;
     LOOP_ARGS(opt, args) {
@@ -91,6 +93,9 @@ int main(int argc, char** argv)
                 break;
             case 'S':
                 sandbox = false;
+                break;
+            case 'd':
+                durations_s = (size_t) atoi(optarg);
                 break;
             default:
                 exit(1);
@@ -145,10 +150,11 @@ int main(int argc, char** argv)
 
     const int frame_delay = 1000 / view.fps;
     Uint32 prev_time = SDL_GetTicks();
+    Uint32 start_time = SDL_GetTicks();
     while (running && keep_running) {
         Uint32 frame_start = SDL_GetTicks();
         float delta_time = (frame_start - prev_time) / 1000.0f;
-        prev_time = frame_start; 
+        prev_time = frame_start;
 
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT)
@@ -166,7 +172,7 @@ int main(int argc, char** argv)
                     scene.options.background.g,
                     scene.options.background.b, 255));
 
-        if(!is_art){
+        if (!is_art) {
             lua_getglobal(view.L, "update");
             if (lua_isfunction(view.L, -1)) {
                 lua_pushnumber(view.L, delta_time);
@@ -186,15 +192,14 @@ int main(int argc, char** argv)
             ObjectPaint(o, &view);
         }
 
-        if(ascii)
+        if (ascii)
             ViewRenderAscii(&view);
         else
             ViewRender(&view);
 
-        if(export) {
-            // Save frame to PPM
+        if (export) {
             char ppm_file[64];
-            snprintf(ppm_file, sizeof(ppm_file), ".artc/frame%04d.ppm", frame); // pad for ffmpeg
+            snprintf(ppm_file, sizeof(ppm_file), ".artc/frame%04d.ppm", frame);
             SaveFrameToPPM(ppm_file, view.width, view.height, view.surface);
         }
 
@@ -202,7 +207,15 @@ int main(int argc, char** argv)
         if (frame_delay > frame_time) {
             SDL_Delay(frame_delay - frame_time);
         }
+
         frame++;
+
+        if (durations_s > 0) {
+            Uint32 elapsed_ms = SDL_GetTicks() - start_time;
+            if (elapsed_ms >= durations_s * 1000) {
+                running = false;
+            }
+        }
     }
 
     if(export)

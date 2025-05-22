@@ -14,22 +14,23 @@ function _artc
         set COMP_CWORD (count $COMP_WORDS)
     end
 
-    set literals "--help" "gif" "--ascii" "--format" "mp4" "-o" "-v" "-F" "--version" "--export" "--output" "--no-sandbox" "-h" "-x" "gif" "-A" "-S" "mp4"
+    set literals "--help" "gif" "-d" "--ascii" "--format" "mp4" "-o" "-v" "-F" "--version" "--export" "--output" "--no-sandbox" "--duration" "-h" "-x" "gif" "-A" "-S" "mp4"
 
     set descriptions
-    set descriptions[6] "Specify a different output path"
-    set descriptions[7] "Prints the current version and exits"
-    set descriptions[8] "Specify the format of the exported file"
-    set descriptions[13] "Prints the help message"
-    set descriptions[14] "Export the render in a media file"
-    set descriptions[16] "Render visuals in the terminal"
-    set descriptions[17] "Do not sandbox lua (Be careful)"
+    set descriptions[3] "Exit after the specified amount of seconds"
+    set descriptions[7] "Specify a different output path"
+    set descriptions[8] "Prints the current version and exits"
+    set descriptions[9] "Specify the format of the exported file"
+    set descriptions[15] "Prints the help message"
+    set descriptions[16] "Export the render in a media file"
+    set descriptions[18] "Render visuals in the terminal"
+    set descriptions[19] "Do not sandbox lua (Be careful)"
 
     set literal_transitions
-    set literal_transitions[2] "set inputs 1 11 8 9 3 4 6 13 14 16 17 7 12 10; set tos 4 3 6 4 4 5 3 4 4 4 4 4 4 4"
-    set literal_transitions[4] "set inputs 1 11 8 9 3 4 6 13 14 16 17 7 12 10; set tos 4 3 6 4 4 5 3 4 4 4 4 4 4 4"
-    set literal_transitions[5] "set inputs 15 18; set tos 4 4"
-    set literal_transitions[6] "set inputs 15 18; set tos 4 4"
+    set literal_transitions[2] "set inputs 1 3 4 5 7 8 9 10 12 14 13 11 15 16 18 19; set tos 4 4 4 5 3 4 6 4 3 4 4 4 4 4 4 4"
+    set literal_transitions[4] "set inputs 1 3 4 5 7 8 9 10 12 14 13 11 15 16 18 19; set tos 4 4 4 5 3 4 6 4 3 4 4 4 4 4 4 4"
+    set literal_transitions[5] "set inputs 17 20; set tos 4 4"
+    set literal_transitions[6] "set inputs 17 20; set tos 4 4"
 
     set match_anything_transitions_from 3 1
     set match_anything_transitions_to 4 2

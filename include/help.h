@@ -21,13 +21,14 @@ static inline void help()
     printf("\n");
 
     PB("OPTIONS");
-    PI("-h --help          Prints this message");
-    PI("-v --version       Prints the current version and exits");
-    PI("-x --export        Export the render in a media file");
-    PI("-F --format <FMT>  Specify the format of the exported file");
-    PI("-o --output <PATH> Specify a different output path");
-    PI("-A --ascii         Render visuals in the terminal");
-    PI("-S --no-sandbox    Do not sandbox lua (Be careful)");
+    PI("-h --help            Prints this message");
+    PI("-v --version         Prints the current version and exits");
+    PI("-x --export          Export the render in a media file");
+    PI("-F --format <FMT>    Specify the format of the exported file");
+    PI("-o --output <PATH>   Specify a different output path");
+    PI("-A --ascii           Render visuals in the terminal");
+    PI("-S --no-sandbox      Do not sandbox lua (Be careful)");
+    PI("-d --duration <sec>  Exit after <sec> seconds");
     printf("\n");
     
     printf("%sWritten by KDesp73%s\n", ANSI_ITALIC, ANSI_RESET);
