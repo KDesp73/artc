@@ -27,6 +27,7 @@ static inline void help()
     PI("-F --format <FMT>  Specify the format of the exported file");
     PI("-o --output <PATH> Specify a different output path");
     PI("-A --ascii         Render visuals in the terminal");
+    PI("-S --no-sandbox    Do not sandbox lua (Be careful)");
     printf("\n");
     
     printf("%sWritten by KDesp73%s\n", ANSI_ITALIC, ANSI_RESET);

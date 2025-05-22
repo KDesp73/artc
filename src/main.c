@@ -52,6 +52,7 @@ int main(int argc, char** argv)
         cli_arg_new('F', "format", "", required_argument),
         cli_arg_new('o', "output", "", required_argument),
         cli_arg_new('A', "ascii", "", no_argument),
+        cli_arg_new('S', "no-sandbox", "", no_argument),
         NULL
     );
 
@@ -60,6 +61,7 @@ int main(int argc, char** argv)
     char* format = "mp4";
     char* output = NULL;
     bool ascii = false;
+    bool sandbox = true;
 
     int opt;
     LOOP_ARGS(opt, args) {
@@ -87,6 +89,9 @@ int main(int argc, char** argv)
             case 'A':
                 ascii = true;
                 break;
+            case 'S':
+                sandbox = false;
+                break;
             default:
                 exit(1);
         }
@@ -97,6 +102,10 @@ int main(int argc, char** argv)
         dir_remove(".artc");
     }
     dir_create(".artc");
+
+    if(!sandbox){
+        WARN("Lua is not being sandboxed. With great power comes great responsibility");
+    }
 
     if (argc == 1 || argv[argc - 1][0] == '-') {
         ERRO("Provide an .art file");
@@ -111,7 +120,11 @@ int main(int argc, char** argv)
     bool is_art = strstr(file, ".art");
     output = (output) ? output : swap_ext(file, format);
 
-    scene = SceneLoad(file);
+    if(!strcmp(file_extension(file), "art"))
+        scene = SceneLoadArt(file);
+    else 
+        scene = SceneLoadLua(file, sandbox);
+
     if(!scene.loaded) {
         ERRO("Could not load scene");
         return 1;

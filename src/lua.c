@@ -341,7 +341,7 @@ void timeout_hook(lua_State *L, lua_Debug *ar)
     }
 }
 
-Scene SceneLoadLua(const char* filename)
+Scene SceneLoadLua(const char* filename, bool sandbox)
 {
     memset(&scene, 0, sizeof(Scene));
     scene.options.width = 640;
@@ -349,22 +349,26 @@ Scene SceneLoadLua(const char* filename)
     scene.options.background = (SDL_Color){0, 0, 0, 255};
 
     lua_State* L = luaL_newstate();
-    int libs_loaded = 0;
-    luaL_requiref(L, "_G", luaopen_base, 1); libs_loaded++;
-    luaL_requiref(L, "math", luaopen_math, 1); libs_loaded++;
-    luaL_requiref(L, "table", luaopen_table, 1); libs_loaded++;
-    luaL_requiref(L, "string", luaopen_string, 1); libs_loaded++;
-    lua_pop(L, libs_loaded);
+    if(sandbox){
+        int libs_loaded = 0;
+        luaL_requiref(L, "_G", luaopen_base, 1); libs_loaded++;
+        luaL_requiref(L, "math", luaopen_math, 1); libs_loaded++;
+        luaL_requiref(L, "table", luaopen_table, 1); libs_loaded++;
+        luaL_requiref(L, "string", luaopen_string, 1); libs_loaded++;
+        lua_pop(L, libs_loaded);
 
-    lua_pushnil(L); lua_setglobal(L, "dofile");
-    lua_pushnil(L); lua_setglobal(L, "loadfile");
-    lua_pushnil(L); lua_setglobal(L, "require");
-    lua_pushnil(L); lua_setglobal(L, "os");
-    lua_pushnil(L); lua_setglobal(L, "io");
-    lua_pushnil(L); lua_setglobal(L, "package");
-    lua_pushnil(L); lua_setglobal(L, "debug");
+        lua_pushnil(L); lua_setglobal(L, "dofile");
+        lua_pushnil(L); lua_setglobal(L, "loadfile");
+        lua_pushnil(L); lua_setglobal(L, "require");
+        lua_pushnil(L); lua_setglobal(L, "os");
+        lua_pushnil(L); lua_setglobal(L, "io");
+        lua_pushnil(L); lua_setglobal(L, "package");
+        lua_pushnil(L); lua_setglobal(L, "debug");
 
-    lua_sethook(L, timeout_hook, LUA_MASKCOUNT, 100000);
+        lua_sethook(L, timeout_hook, LUA_MASKCOUNT, 100000);
+    } else {
+        luaL_openlibs(L);
+    }
 
     setup_lua(L);
 

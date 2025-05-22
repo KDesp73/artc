@@ -20,9 +20,8 @@ typedef struct {
     bool loaded;
 } Scene;
 
-Scene SceneLoad(const char* filename);
 Scene SceneLoadArt(const char* filename);
-Scene SceneLoadLua(const char* filename);
+Scene SceneLoadLua(const char* filename, bool sandbox);
 
 // PARSING UTILS
 ObjectType parse_type(const char* s);

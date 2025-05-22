@@ -3,13 +3,6 @@
 #include "files.h"
 #include <string.h>
 
-Scene SceneLoad(const char* filename)
-{
-    if(!strcmp(file_extension(filename), "art")) return SceneLoadArt(filename);
-    else return SceneLoadLua(filename);
-}
-
-
 // PARSING UTILS
 MotionType parse_motion(const char* s)
 {
