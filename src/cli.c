@@ -2,6 +2,7 @@
 #include "help.h"
 #include "io/cli.h"
 #include "io/logging.h"
+#include "scene.h"
 #include "version.h"
 
 
@@ -13,6 +14,7 @@ void CliValuesInit(CliValues* v)
     v->ascii = false;
     v->sandbox = true;
     v->durations_s = 0;
+    v->max_entities = MAX_ENTITIES;
 }
 
 static bool validate_format(char* fmt)
@@ -33,14 +35,15 @@ void CliParse(CliValues* v, int argc, char** argv)
     version(&maj, &min, &pat);
 
     cli_args_t args = cli_args_make(
-        cli_arg_new('h', "help", "", no_argument),
-        cli_arg_new('v', "version", "", no_argument),
-        cli_arg_new('x', "export", "", no_argument),
-        cli_arg_new('F', "format", "", required_argument),
-        cli_arg_new('o', "output", "", required_argument),
-        cli_arg_new('A', "ascii", "", no_argument),
-        cli_arg_new('S', "no-sandbox", "", no_argument),
-        cli_arg_new('d', "duration", "", required_argument),
+        cli_arg_new('h', "help", "Prints this message", no_argument),
+        cli_arg_new('v', "version", "Prints the current version and exits", no_argument),
+        cli_arg_new('x', "export", "Export the render in a media file", no_argument),
+        cli_arg_new('F', "format", "Specify the format of the exported file", required_argument),
+        cli_arg_new('o', "output", "Specify a different output path", required_argument),
+        cli_arg_new('A', "ascii", "Render visuals in the terminal", no_argument),
+        cli_arg_new('S', "no-sandbox", "Do not sandbox lua (Be careful)", no_argument),
+        cli_arg_new('d', "duration", "Exit after the provided amount of seconds", required_argument),
+        cli_arg_new('E', "max-entities", "Specify the max amount of entities", required_argument),
         NULL
     );
 
@@ -48,7 +51,8 @@ void CliParse(CliValues* v, int argc, char** argv)
     LOOP_ARGS(opt, args) {
         switch (opt) {
             case 'h':
-                help();
+                cli_help(args, "artc <FILE> [<OPTIONS>...]", "Written by KDesp73");
+                // help();
                 exit(0);
             case 'v':
                 printf("artc v%d.%d.%d\n", maj, min, pat);
@@ -74,7 +78,12 @@ void CliParse(CliValues* v, int argc, char** argv)
                 v->sandbox = false;
                 break;
             case 'd':
+                // TODO: validate input
                 v->durations_s = (size_t) atoi(optarg);
+                break;
+            case 'E':
+                // TODO: validate input
+                v->max_entities = (size_t) atoi(optarg);
                 break;
             default:
                 exit(1);

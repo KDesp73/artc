@@ -11,6 +11,7 @@ typedef struct {
     bool ascii;
     bool sandbox;
     size_t durations_s;
+    size_t max_entities;
 } CliValues;
 
 void CliValuesInit(CliValues* v);

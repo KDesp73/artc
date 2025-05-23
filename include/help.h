@@ -14,6 +14,7 @@
         printf("%s\n", ANSI_RESET); \
     } while(0)
 
+// NOTE: currently unused since the interface is simple enough to be handled by the cli.h library
 static inline void help()
 {
     PB("USAGE");
@@ -29,6 +30,7 @@ static inline void help()
     PI("-A --ascii           Render visuals in the terminal");
     PI("-S --no-sandbox      Do not sandbox lua (Be careful)");
     PI("-d --duration <sec>  Exit after <sec> seconds");
+    PI("-E --max-entities    Specify the max amount of entities");
     printf("\n");
     
     printf("%sWritten by KDesp73%s\n", ANSI_ITALIC, ANSI_RESET);
