@@ -14,7 +14,6 @@ void CliValuesInit(CliValues* v)
     v->ascii = false;
     v->sandbox = true;
     v->durations_s = 0;
-    v->max_entities = MAX_ENTITIES;
 }
 
 static bool validate_format(char* fmt)
@@ -43,7 +42,6 @@ void CliParse(CliValues* v, int argc, char** argv)
         cli_arg_new('A', "ascii", "Render visuals in the terminal", no_argument),
         cli_arg_new('S', "no-sandbox", "Do not sandbox lua (Be careful)", no_argument),
         cli_arg_new('d', "duration", "Exit after the provided amount of seconds", required_argument),
-        cli_arg_new('E', "max-entities", "Specify the max amount of entities", required_argument),
         NULL
     );
 
@@ -80,10 +78,6 @@ void CliParse(CliValues* v, int argc, char** argv)
             case 'd':
                 // TODO: validate input
                 v->durations_s = (size_t) atoi(optarg);
-                break;
-            case 'E':
-                // TODO: validate input
-                v->max_entities = (size_t) atoi(optarg);
                 break;
             default:
                 exit(1);

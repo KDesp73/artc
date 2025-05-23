@@ -28,11 +28,11 @@ void handle_sigint(int sig) {
 
 View view = {0};
 Scene scene = {0};
+CliValues values = {0};
 int main(int argc, char** argv)
 {
     signal(SIGINT, handle_sigint);
 
-    CliValues values = {0};
     CliValuesInit(&values);
     CliParse(&values, argc, argv);
     
