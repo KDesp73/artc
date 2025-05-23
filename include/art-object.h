@@ -15,6 +15,7 @@ typedef enum {
     MOTION_SWIRL,
     MOTION_NOISE,
 } MotionType;
+
 char* motion_to_string(MotionType motion);
 
 typedef enum {
@@ -23,11 +24,16 @@ typedef enum {
     OBJECT_CIRCLE,
     OBJECT_TRIANGLE,
 } ObjectType;
+
 char* object_type_to_string(ObjectType obj);
 ObjectType parse_object_type(const char* str);
 
+typedef enum {
+    ENTITY_OBJECT,
+    ENTITY_LINE,
+} EntityType;
+
 typedef struct {
-    int id;
     float x, y;
     float cx, cy;
     float size;
@@ -40,6 +46,26 @@ typedef struct {
 
 void ObjectUpdate(ArtObject* o, float time);
 void ObjectPaint(ArtObject* o, View* view);
-void ObjectPrint(ArtObject* o);
+
+typedef struct {
+    float x1, x2, y1, y2;
+    float thickness;
+    SDL_Color color;
+} ArtLine;
+
+void LinePaint(ArtLine* l, View* view);
+
+typedef struct {
+    int id;
+    EntityType kind;
+    union {
+        ArtObject object;
+        ArtLine line;
+    };
+} ArtEntity;
+void ObjectPrint(ArtEntity* e);
+
+void EntityPaint(ArtEntity* e, View* view);
+void EntityUpdate(ArtEntity* e, float time);
 
 #endif // ART_OBJECT_H

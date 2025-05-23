@@ -3,7 +3,7 @@
 
 #include "art-object.h"
 
-#define MAX_OBJECTS 512
+#define MAX_ENTITIES 512
 
 typedef struct {
     int width;
@@ -14,7 +14,7 @@ typedef struct {
 typedef struct {
     SceneOptions options;
 
-    ArtObject objects[MAX_OBJECTS];
+    ArtEntity entities[MAX_ENTITIES];
     int count;
     int next_id;
     bool loaded;

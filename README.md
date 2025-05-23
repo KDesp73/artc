@@ -103,7 +103,6 @@ Check [artc.lua](./artc.lua) for the full list of available functions
 - [Artc Editor](https://artc-editor.vercel.app/)
 - [Artc Service](https://github.com/KDesp73/artc-service)
 
-
 ## 🪪 License
 
 [MIT](./LICENSE)

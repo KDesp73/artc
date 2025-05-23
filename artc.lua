@@ -12,19 +12,28 @@ function window(width, height) end
 
 --- Create a circle object
 -- @param opts table: {x, y, size, type, color, motion, speed, radius}
+-- @return entity id
 function object(opts) end
 
 --- Create a circle object
 -- @param opts table: {x, y, size, color, motion, speed, radius}
+-- @return entity id
 function circle(opts) end
 
 --- Create a square object
 -- @param opts table: {x, y, size, color, motion, speed, radius}
+-- @return entity id
 function square(opts) end
 
 --- Create a triangle object
 -- @param opts table: {x, y, size, color, motion, speed, radius}
+-- @return entity id
 function triangle(opts) end
+
+--- Create a line entity
+-- @param opts table: {x1, y1, x2, y2, color, thickness}
+-- @return entity id
+function line(opts) end
 
 --- Get elapsed time in milliseconds
 -- @return number

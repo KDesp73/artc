@@ -15,12 +15,13 @@ int lua_create_object(lua_State* L)
     if (!lua_istable(L, 1))
         return luaL_error(L, "Expected a table");
 
-    if (scene.count >= MAX_OBJECTS)
-        return luaL_error(L, "Maximum number of objects reached");
+    if (scene.count >= MAX_ENTITIES)
+        return luaL_error(L, "Maximum number of entities reached");
 
-    ArtObject* obj = &scene.objects[scene.count++];
+    ArtEntity* entity = &scene.entities[scene.count++];
+    ArtObject* obj = &entity->object;
 
-    obj->id = scene.next_id++;
+    entity->id = scene.next_id++;
 
     // x (default 0)
     lua_getfield(L, 1, "x");
@@ -76,7 +77,7 @@ int lua_create_object(lua_State* L)
     obj->cx = obj->x;
     obj->cy = obj->y;
 
-    lua_pushinteger(L, obj->id);
+    lua_pushinteger(L, entity->id);
     return 1;
 
 }
@@ -86,13 +87,15 @@ static int create_object(lua_State* L, ObjectType type)
     if (!lua_istable(L, 1))
         return luaL_error(L, "Expected a table");
 
-    if (scene.count >= MAX_OBJECTS)
-        return luaL_error(L, "Maximum number of objects reached");
+    if (scene.count >= MAX_ENTITIES)
+        return luaL_error(L, "Maximum number of entities reached");
 
-    ArtObject* obj = &scene.objects[scene.count++];
+    ArtEntity* entity = &scene.entities[scene.count++];
+    ArtObject* obj = &entity->object;
     obj->type = type;
 
-    obj->id = scene.next_id++;
+    entity->id = scene.next_id++;
+    entity->kind = ENTITY_OBJECT;
 
     // x (default 0)
     lua_getfield(L, 1, "x");
@@ -140,7 +143,7 @@ static int create_object(lua_State* L, ObjectType type)
     obj->cx = obj->x;
     obj->cy = obj->y;
 
-    lua_pushinteger(L, obj->id);
+    lua_pushinteger(L, entity->id);
     return 1;
 }
 
@@ -158,6 +161,59 @@ int lua_create_triangle(lua_State* L)
 {
     return create_object(L, OBJECT_TRIANGLE);
 }
+
+int lua_create_line(lua_State* L)
+{
+    if (!lua_istable(L, 1))
+        return luaL_error(L, "Expected a table");
+
+    if (scene.count >= MAX_ENTITIES)
+        return luaL_error(L, "Maximum number of entities reached");
+
+    ArtEntity* entity = &scene.entities[scene.count++];
+    ArtLine* line = &entity->line;
+    entity->kind = ENTITY_LINE;
+    entity->id = scene.next_id++;
+
+    // -- @param opts table: {x1, y1, x2, y2, color}
+
+    // x1 (default 0)
+    lua_getfield(L, 1, "x1");
+    line->x1 = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    // y1 (default 0)
+    lua_getfield(L, 1, "y1");
+    line->y1 = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    // x2 (default 0)
+    lua_getfield(L, 1, "x2");
+    line->x2 = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    // y2 (default 0)
+    lua_getfield(L, 1, "y2");
+    line->y2 = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    // color (default white)
+    lua_getfield(L, 1, "color");
+    if (lua_isstring(L, -1)) {
+        line->color = parse_color(lua_tostring(L, -1));
+    } else {
+        line->color = parse_color("#ffffff");
+    }
+    lua_pop(L, 1);
+
+    lua_getfield(L, 1, "thickness");
+    line->thickness = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    lua_pushinteger(L, entity->id);
+    return 1;
+}
+
 
 int lua_set_background(lua_State* L)
 {
@@ -238,10 +294,10 @@ int lua_clear_scene(lua_State* L)
     return 0;
 }
 
-static ArtObject* find_object_by_id(int id) {
+static ArtEntity* find_entity_by_id(int id) {
     for (int i = 0; i < scene.count; i++) {
-        if (scene.objects[i].id == id)
-            return &scene.objects[i];
+        if (scene.entities[i].id == id)
+            return &scene.entities[i];
     }
     return NULL;
 }
@@ -250,59 +306,92 @@ int lua_modify_object(lua_State* L)
 {
     // Args: (int) id, (table) props
     int id = luaL_checkinteger(L, 1);
-    if (id < 0 || id >= scene.count) {
-        return luaL_error(L, "Invalid object id");
-    }
 
     if (!lua_istable(L, 2)) {
         return luaL_error(L, "Expected table as second argument");
     }
 
-    ArtObject* obj = find_object_by_id(id);
-    if(obj == NULL) {
+    ArtEntity* entity = find_entity_by_id(id);
+    if (entity == NULL) {
         return luaL_error(L, "Could not find object with id: %d", id);
     }
 
-    lua_getfield(L, 2, "x");
-    if (lua_isnumber(L, -1)) obj->x = lua_tonumber(L, -1);
-    lua_pop(L, 1);
+    if (entity->kind == ENTITY_OBJECT) {
+        ArtObject* obj = &entity->object;
 
-    lua_getfield(L, 2, "y");
-    if (lua_isnumber(L, -1)) obj->y = lua_tonumber(L, -1);
-    lua_pop(L, 1);
+        lua_getfield(L, 2, "x");
+        if (lua_isnumber(L, -1)) obj->x = (float)lua_tonumber(L, -1);
+        lua_pop(L, 1);
 
-    lua_getfield(L, 2, "size");
-    if (lua_isnumber(L, -1)) obj->size = lua_tonumber(L, -1);
-    lua_pop(L, 1);
+        lua_getfield(L, 2, "y");
+        if (lua_isnumber(L, -1)) obj->y = (float)lua_tonumber(L, -1);
+        lua_pop(L, 1);
 
-    lua_getfield(L, 2, "speed");
-    if (lua_isnumber(L, -1)) obj->speed = lua_tonumber(L, -1);
-    lua_pop(L, 1);
+        lua_getfield(L, 2, "size");
+        if (lua_isnumber(L, -1)) obj->size = (float)lua_tonumber(L, -1);
+        lua_pop(L, 1);
 
-    lua_getfield(L, 2, "radius");
-    if (lua_isnumber(L, -1)) obj->radius = lua_tonumber(L, -1);
-    lua_pop(L, 1);
+        lua_getfield(L, 2, "speed");
+        if (lua_isnumber(L, -1)) obj->speed = (float)lua_tonumber(L, -1);
+        lua_pop(L, 1);
 
-    lua_getfield(L, 2, "motion");
-    if (lua_isstring(L, -1)) {
-        const char* motion_str = lua_tostring(L, -1);
-        obj->motion = parse_motion(motion_str);
+        lua_getfield(L, 2, "radius");
+        if (lua_isnumber(L, -1)) obj->radius = (float)lua_tonumber(L, -1);
+        lua_pop(L, 1);
+
+        lua_getfield(L, 2, "motion");
+        if (lua_isstring(L, -1)) {
+            const char* motion_str = lua_tostring(L, -1);
+            obj->motion = parse_motion(motion_str);
+        }
+        lua_pop(L, 1);
+
+        lua_getfield(L, 2, "color");
+        if (lua_isstring(L, -1)) {
+            const char* color_str = lua_tostring(L, -1);
+            obj->color = parse_color(color_str);
+        }
+        lua_pop(L, 1);
+
+        lua_getfield(L, 2, "type");
+        if (lua_isstring(L, -1)) {
+            const char* type_str = lua_tostring(L, -1);
+            obj->type = parse_object_type(type_str);
+        }
+        lua_pop(L, 1);
+
+    } else if (entity->kind == ENTITY_LINE) {
+        ArtLine* line = &entity->line;
+
+        lua_getfield(L, 2, "x1");
+        if (lua_isnumber(L, -1)) line->x1 = (float)lua_tonumber(L, -1);
+        lua_pop(L, 1);
+
+        lua_getfield(L, 2, "y1");
+        if (lua_isnumber(L, -1)) line->y1 = (float)lua_tonumber(L, -1);
+        lua_pop(L, 1);
+
+        lua_getfield(L, 2, "x2");
+        if (lua_isnumber(L, -1)) line->x2 = (float)lua_tonumber(L, -1);
+        lua_pop(L, 1);
+
+        lua_getfield(L, 2, "y2");
+        if (lua_isnumber(L, -1)) line->y2 = (float)lua_tonumber(L, -1);
+        lua_pop(L, 1);
+
+        lua_getfield(L, 2, "color");
+        if (lua_isstring(L, -1)) {
+            const char* color_str = lua_tostring(L, -1);
+            line->color = parse_color(color_str);
+        }
+        lua_pop(L, 1);
+
+        lua_getfield(L, 2, "thickness");
+        if (lua_isnumber(L, -1)) line->thickness = (float)lua_tonumber(L, -1);
+        lua_pop(L, 1);
+    } else {
+        return luaL_error(L, "Unknown entity type");
     }
-    lua_pop(L, 1);
-
-    lua_getfield(L, 2, "color");
-    if (lua_isstring(L, -1)) {
-        const char* color_str = lua_tostring(L, -1);
-        obj->color = parse_color(color_str);
-    }
-    lua_pop(L, 1);
-
-    lua_getfield(L, 2, "type");
-    if (lua_isstring(L, -1)) {
-        const char* type_str = lua_tostring(L, -1);
-        obj->type = parse_object_type(type_str);
-    }
-    lua_pop(L, 1);
 
     return 0;
 }
@@ -314,7 +403,7 @@ int lua_set_seed(lua_State* L)
     }
 
     unsigned int seed = (unsigned int)lua_tointeger(L, 1);
-    
+
     srand(seed);
 
     return 0;

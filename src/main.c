@@ -187,9 +187,9 @@ int main(int argc, char** argv)
         }
 
         for (int i = 0; i < scene.count; i++) {
-            ArtObject* o = &scene.objects[i];
-            ObjectUpdate(o, t);
-            ObjectPaint(o, &view);
+            ArtEntity* e = &scene.entities[i];
+            EntityUpdate(e, t);
+            EntityPaint(e, &view);
         }
 
         if (ascii)
