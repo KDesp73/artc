@@ -7,9 +7,9 @@ extern "C" {
 
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 2
-#define VERSION_PATCH 3
+#define VERSION_PATCH 4
 
-#define VERSION_STRING "0.2.3"
+#define VERSION_STRING "0.2.4"
 
 #define VERSION_HEX ((VERSION_MAJOR * 10000) + (VERSION_MINOR * 100) + VERSION_PATCH)
 
