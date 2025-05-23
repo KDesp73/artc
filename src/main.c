@@ -2,32 +2,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "art-object.h"
+#include "cli.h"
+#include "entities.h"
 #include "export.h"
 #include "files.h"
-#include "help.h"
 #include "io/ansi.h"
 #include "lua/lua.h"
 #include "scene.h"
 #include "view.h"
-#include "version.h"
 #define CLI_IMPLEMENTATION
 #include "io/cli.h"
 #define LOGGING_IMPLEMENTATION
 #include "io/logging.h"
 #include <stdbool.h>
 
-static bool validate_format(char* fmt)
-{
-    char* allowed[] = {
-        "gif", "mp4",
-    };
-    for(size_t i = 0; i < sizeof(allowed)/sizeof(allowed[0]); i++){
-        if(!strcmp(fmt, allowed[i])) return true;
-    }
-
-    return false;
-}
 
 static volatile int keep_running = 1;
 void handle_sigint(int sig) {
@@ -37,83 +25,29 @@ void handle_sigint(int sig) {
     keep_running = 0;
 }
 
+
 View view = {0};
 Scene scene = {0};
 int main(int argc, char** argv)
 {
     signal(SIGINT, handle_sigint);
-    int maj, min, pat;
-    version(&maj, &min, &pat);
 
-    cli_args_t args = cli_args_make(
-        cli_arg_new('h', "help", "", no_argument),
-        cli_arg_new('v', "version", "", no_argument),
-        cli_arg_new('x', "export", "", no_argument),
-        cli_arg_new('F', "format", "", required_argument),
-        cli_arg_new('o', "output", "", required_argument),
-        cli_arg_new('A', "ascii", "", no_argument),
-        cli_arg_new('S', "no-sandbox", "", no_argument),
-        cli_arg_new('d', "duration", "", required_argument),
-        NULL
-    );
-
-    // CLI argument values
-    bool export = false;
-    char* format = "mp4";
-    char* output = NULL;
-    bool ascii = false;
-    bool sandbox = true;
-    size_t durations_s = 0;
-
-    int opt;
-    LOOP_ARGS(opt, args) {
-        switch (opt) {
-            case 'h':
-                help();
-                exit(0);
-            case 'v':
-                printf("artc v%d.%d.%d\n", maj, min, pat);
-                exit(0);
-            case 'x':
-                export = true;
-                break;
-            case 'F':
-                format = optarg;
-                if(!validate_format(format)) {
-                    ERRO("Invalid format: %s", format);
-                    exit(1);
-                }
-
-                break;
-            case 'o':
-                output = optarg;
-                break;
-            case 'A':
-                ascii = true;
-                break;
-            case 'S':
-                sandbox = false;
-                break;
-            case 'd':
-                durations_s = (size_t) atoi(optarg);
-                break;
-            default:
-                exit(1);
-        }
-    }
-    cli_args_free(&args);
+    CliValues values = {0};
+    CliValuesInit(&values);
+    CliParse(&values, argc, argv);
+    
 
     if(dir_exists(".artc")) {
         dir_remove(".artc");
     }
     dir_create(".artc");
 
-    if(!sandbox){
+    if(!values.sandbox){
         WARN("Lua is not being sandboxed. With great power comes great responsibility");
     }
 
     if (argc == 1 || argv[argc - 1][0] == '-') {
-        ERRO("Provide an .art file");
+        ERRO("Provide a file");
         return 1;
     }
 
@@ -123,12 +57,12 @@ int main(int argc, char** argv)
         return 1;
     }
     bool is_art = strstr(file, ".art");
-    output = (output) ? output : swap_ext(file, format);
+    values.output = (values.output) ? values.output : swap_ext(file, values.format);
 
     if(!strcmp(file_extension(file), "art"))
         scene = SceneLoadArt(file);
     else 
-        scene = SceneLoadLua(file, sandbox);
+        scene = SceneLoadLua(file, values.sandbox);
 
     if(!scene.loaded) {
         ERRO("Could not load scene");
@@ -139,8 +73,8 @@ int main(int argc, char** argv)
     view.height = scene.options.height;
     if (!ViewInit(&view)) return 1;
 
-    if(ascii){ 
-        export = false;
+    if(values.ascii){ 
+        values.export = false;
         view.fps = 30;
     }
 
@@ -192,12 +126,12 @@ int main(int argc, char** argv)
             EntityPaint(e, &view);
         }
 
-        if (ascii)
+        if (values.ascii)
             ViewRenderAscii(&view);
         else
             ViewRender(&view);
 
-        if (export) {
+        if (values.export) {
             char ppm_file[64];
             snprintf(ppm_file, sizeof(ppm_file), ".artc/frame%04d.ppm", frame);
             SaveFrameToPPM(ppm_file, view.width, view.height, view.surface);
@@ -210,16 +144,16 @@ int main(int argc, char** argv)
 
         frame++;
 
-        if (durations_s > 0) {
+        if (values.durations_s > 0) {
             Uint32 elapsed_ms = SDL_GetTicks() - start_time;
-            if (elapsed_ms >= durations_s * 1000) {
+            if (elapsed_ms >= values.durations_s * 1000) {
                 running = false;
             }
         }
     }
 
-    if(export)
-        Export(format, output, view.fps);
+    if(values.export)
+        Export(values.format, values.output, view.fps);
 
 cleanup:
     ViewFree(&view);

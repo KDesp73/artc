@@ -1,7 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "art-object.h"
+#include "entities.h"
 
 #define MAX_ENTITIES 4096
 
@@ -23,10 +23,6 @@ typedef struct {
 Scene SceneLoadArt(const char* filename);
 Scene SceneLoadLua(const char* filename, bool sandbox);
 
-// PARSING UTILS
-ObjectType parse_type(const char* s);
-MotionType parse_motion(const char* s);
-SDL_Color parse_color(const char* hex);
 
 
 #endif // PARSER_H

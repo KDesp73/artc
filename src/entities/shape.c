@@ -1,10 +1,6 @@
-#include "art-object.h"
-#include <math.h>
+#include "entities.h"
 
-#include <math.h>
-#include <stdlib.h>
-
-void ObjectUpdate(ArtObject* o, float time)
+void ShapeUpdate(ArtShape* o, float time)
 {
     switch (o->motion) {
         case MOTION_STATIC:
@@ -57,14 +53,14 @@ void ObjectUpdate(ArtObject* o, float time)
     }
 }
 
-void ObjectPaint(ArtObject* o, View* view)
+void ShapePaint(ArtShape* o, View* view)
 {
     Uint32 color = SDL_MapRGBA(view->surface->format, o->color.r, o->color.g, o->color.b, 255);
 
-    if (o->type == OBJECT_SQUARE) {
+    if (o->type == SHAPE_SQUARE) {
         SDL_Rect r = { (int)o->x, (int)o->y, (int)o->size, (int)o->size };
         SDL_FillRect(view->surface, &r, color);
-    } else if (o->type == OBJECT_CIRCLE) {
+    } else if (o->type == SHAPE_CIRCLE) {
         int cx = (int)o->x;
         int cy = (int)o->y;
         int r = (int)o->size;
@@ -82,7 +78,7 @@ void ObjectPaint(ArtObject* o, View* view)
                 }
             }
         }
-    } else if (o->type == OBJECT_TRIANGLE) {
+    } else if (o->type == SHAPE_TRIANGLE) {
         int cx = (int)o->x;
         int cy = (int)o->y;
         int size = (int)o->size;
@@ -102,7 +98,7 @@ void ObjectPaint(ArtObject* o, View* view)
     }
 }
 
-char* motion_to_string(MotionType motion)
+char* Motion2Str(MotionType motion)
 {
     switch (motion) {
     case MOTION_STATIC: return "static";
@@ -118,35 +114,35 @@ char* motion_to_string(MotionType motion)
     }
 }
 
-char* object_type_to_string(ObjectType obj)
+char* ShapeType2Str(ShapeType obj)
 {
     switch (obj) {
-        case OBJECT_SQUARE: return "square";
-        case OBJECT_CIRCLE: return "circle";
-        case OBJECT_TRIANGLE: return "triangle";
-        case OBJECT_NONE:
+        case SHAPE_SQUARE: return "square";
+        case SHAPE_CIRCLE: return "circle";
+        case SHAPE_TRIANGLE: return "triangle";
+        case SHAPE_NONE:
         default:
             return "none";
     }
 }
 
-ObjectType parse_object_type(const char* str)
+ShapeType ParseShapeType(const char* str)
 {
-    if(!strcmp(str, object_type_to_string(OBJECT_CIRCLE))) return OBJECT_CIRCLE;
-    if(!strcmp(str, object_type_to_string(OBJECT_TRIANGLE))) return OBJECT_TRIANGLE;
-    if(!strcmp(str, object_type_to_string(OBJECT_SQUARE))) return OBJECT_SQUARE;
-    return OBJECT_NONE;
+    if(!strcmp(str, ShapeType2Str(SHAPE_CIRCLE))) return SHAPE_CIRCLE;
+    if(!strcmp(str, ShapeType2Str(SHAPE_TRIANGLE))) return SHAPE_TRIANGLE;
+    if(!strcmp(str, ShapeType2Str(SHAPE_SQUARE))) return SHAPE_SQUARE;
+    return SHAPE_NONE;
 }
 
-void ObjectPrint(ArtEntity* e)
+void ShapePrint(ArtEntity* e)
 {
-    ArtObject* o = &e->object;
+    ArtShape* o = &e->shape;
     if (!o) {
         printf("Object is NULL\n");
         return;
     }
 
-    printf("ArtObject id=%d type=%s\n", e->id, object_type_to_string(o->type));
+    printf("ArtObject id=%d type=%s\n", e->id, ShapeType2Str(o->type));
     printf("  Position: (%.2f, %.2f)\n", o->x, o->y);
     printf("  Size: %.2f\n", o->size);
     printf("  Color: R=%d G=%d B=%d\n", o->color.r, o->color.g, o->color.b);
@@ -156,76 +152,17 @@ void ObjectPrint(ArtEntity* e)
     printf("  Center: (%.2f, %.2f)\n", o->cx, o->cy);
 }
 
-void LinePaint(ArtLine* l, View* view)
+MotionType ParseMotion(const char* s)
 {
-    if (!l || !view || !view->surface) return;
+    if (strcmp(s, "spin") == 0) return MOTION_SPIN;
+    if (strcmp(s, "drift") == 0) return MOTION_DRIFT;
+    if (strcmp(s, "pulse") == 0) return MOTION_PULSE;
+    if (strcmp(s, "swirl") == 0) return MOTION_SWIRL;
+    if (strcmp(s, "bounce") == 0) return MOTION_BOUNCE;
+    if (strcmp(s, "noise") == 0) return MOTION_NOISE;
+    if (strcmp(s, "zigzag") == 0) return MOTION_ZIGZAG;
+    if (strcmp(s, "wave") == 0) return MOTION_WAVE;
 
-    Uint32 color = SDL_MapRGBA(view->surface->format, l->color.r, l->color.g, l->color.b, l->color.a);
-
-    Uint32* pixels = (Uint32*)view->surface->pixels;
-    int pitch = view->surface->pitch / 4;
-
-    float x1 = l->x1;
-    float y1 = l->y1;
-    float x2 = l->x2;
-    float y2 = l->y2;
-    float thickness = l->thickness;
-
-    float dx = x2 - x1;
-    float dy = y2 - y1;
-    float length = sqrtf(dx * dx + dy * dy);
-    if (length == 0) return;
-
-    float half_thickness = thickness / 2.0f;
-
-    int steps = (int)length;
-
-    for (int i = 0; i <= steps; i++) {
-        float t = (float)i / (float)steps;
-        float cx = x1 + t * dx;
-        float cy = y1 + t * dy;
-
-        int radius = (int)(half_thickness);
-
-        int start_x = (int)(cx - radius);
-        int end_x = (int)(cx + radius);
-        int start_y = (int)(cy - radius);
-        int end_y = (int)(cy + radius);
-
-        for (int py = start_y; py <= end_y; py++) {
-            if (py < 0 || py >= view->height) continue;
-
-            for (int px = start_x; px <= end_x; px++) {
-                if (px < 0 || px >= view->width) continue;
-
-                int dxp = px - (int)cx;
-                int dyp = py - (int)cy;
-
-                if (dxp*dxp + dyp*dyp <= radius*radius) {
-                    pixels[py * pitch + px] = color;
-                }
-            }
-        }
-    }
-}
-
-void EntityPaint(ArtEntity* e, View* view)
-{
-    switch(e->kind){
-        case ENTITY_LINE:
-            LinePaint(&e->line, view);
-            break;
-        case ENTITY_OBJECT:
-            ObjectPaint(&e->object, view);
-            break;
-        default:
-            break;
-    }
-}
-void EntityUpdate(ArtEntity* e, float time)
-{
-    if(e->kind == ENTITY_LINE) return;
-    
-    ObjectUpdate(&e->object, time);
+    return MOTION_STATIC;
 }
 

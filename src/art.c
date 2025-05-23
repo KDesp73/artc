@@ -1,3 +1,4 @@
+#include "entities.h"
 #include "scene.h"
 
 Scene SceneLoadArt(const char* filename)
@@ -23,10 +24,10 @@ Scene SceneLoadArt(const char* filename)
             sscanf(l, "[%63[^]]", current_section);
             if (strncmp(current_section, "object", 6) == 0 && scene.count < MAX_ENTITIES) {
                 entity = &scene.entities[scene.count++];
-                entity->object.motion = MOTION_STATIC;
-                entity->object.color = (SDL_Color){255, 255, 255, 255};
-                entity->object.cx = scene.options.width / 2;
-                entity->object.cy = scene.options.height / 2;
+                entity->shape.motion = MOTION_STATIC;
+                entity->shape.color = (SDL_Color){255, 255, 255, 255};
+                entity->shape.cx = scene.options.width / 2;
+                entity->shape.cy = scene.options.height / 2;
             } else {
                 entity = NULL;
             }
@@ -40,26 +41,26 @@ Scene SceneLoadArt(const char* filename)
                 else if (strcmp(key, "height") == 0)
                     scene.options.height = atoi(val);
                 else if (strcmp(key, "background") == 0)
-                    scene.options.background = parse_color(val);
+                    scene.options.background = ParseHexColor(val);
             } else if (entity) {
                 if (strcmp(key, "x") == 0) {
-                    entity->object.x = (strcmp(val, "center") == 0) ? scene.options.width / 2 :
+                    entity->shape.x = (strcmp(val, "center") == 0) ? scene.options.width / 2 :
                              (strcmp(val, "random") == 0) ? rand() % scene.options.width : atof(val);
                 } else if (strcmp(key, "y") == 0) {
-                    entity->object.y = (strcmp(val, "center") == 0) ? scene.options.height / 2 :
+                    entity->shape.y = (strcmp(val, "center") == 0) ? scene.options.height / 2 :
                              (strcmp(val, "random") == 0) ? rand() % scene.options.height : atof(val);
                 } else if (strcmp(key, "size") == 0) {
-                    entity->object.size = atof(val);
+                    entity->shape.size = atof(val);
                 } else if (strcmp(key, "color") == 0) {
-                    entity->object.color = parse_color(val);
+                    entity->shape.color = ParseHexColor(val);
                 } else if (strcmp(key, "motion") == 0) {
-                    entity->object.motion = parse_motion(val);
+                    entity->shape.motion = ParseMotion(val);
                 } else if (strcmp(key, "speed") == 0) {
-                    entity->object.speed = atof(val);
+                    entity->shape.speed = atof(val);
                 } else if (strcmp(key, "radius") == 0) {
-                    entity->object.radius = atof(val);
+                    entity->shape.radius = atof(val);
                 } else if (strcmp(key, "type") == 0) {
-                    entity->object.type = parse_type(val);
+                    entity->shape.type = ParseShapeType(val);
                 }
             }        }
     }

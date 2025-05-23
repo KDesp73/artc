@@ -16,17 +16,12 @@ typedef enum {
     MOTION_NOISE,
 } MotionType;
 
-char* motion_to_string(MotionType motion);
-
 typedef enum {
-    OBJECT_NONE = -1,
-    OBJECT_SQUARE,
-    OBJECT_CIRCLE,
-    OBJECT_TRIANGLE,
-} ObjectType;
-
-char* object_type_to_string(ObjectType obj);
-ObjectType parse_object_type(const char* str);
+    SHAPE_NONE = -1,
+    SHAPE_SQUARE,
+    SHAPE_CIRCLE,
+    SHAPE_TRIANGLE,
+} ShapeType;
 
 typedef enum {
     ENTITY_OBJECT,
@@ -39,13 +34,10 @@ typedef struct {
     float size;
     SDL_Color color;
     MotionType motion;
-    ObjectType type;
+    ShapeType type;
     float speed;
     float radius;
-} ArtObject;
-
-void ObjectUpdate(ArtObject* o, float time);
-void ObjectPaint(ArtObject* o, View* view);
+} ArtShape;
 
 typedef struct {
     float x1, x2, y1, y2;
@@ -53,17 +45,27 @@ typedef struct {
     SDL_Color color;
 } ArtLine;
 
-void LinePaint(ArtLine* l, View* view);
-
 typedef struct {
     int id;
     EntityType kind;
     union {
-        ArtObject object;
+        ArtShape shape;
         ArtLine line;
     };
 } ArtEntity;
-void ObjectPrint(ArtEntity* e);
+
+char* Motion2Str(MotionType motion);
+char* ShapeType2Str(ShapeType obj);
+ShapeType ParseShapeType(const char* str);
+MotionType ParseMotion(const char* s);
+SDL_Color ParseHexColor(const char* hex);
+
+
+void ShapeUpdate(ArtShape* o, float time);
+void ShapePaint(ArtShape* o, View* view);
+void ShapePrint(ArtEntity* e);
+
+void LinePaint(ArtLine* l, View* view);
 
 void EntityPaint(ArtEntity* e, View* view);
 void EntityUpdate(ArtEntity* e, float time);

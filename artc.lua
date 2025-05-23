@@ -10,22 +10,22 @@ function bg(hex) end
 -- @param height number
 function window(width, height) end
 
---- Create a circle object
+--- Create a shape
 -- @param opts table: {x, y, size, type, color, motion, speed, radius}
 -- @return entity id
-function object(opts) end
+function shape(opts) end
 
---- Create a circle object
+--- Create a circle shape
 -- @param opts table: {x, y, size, color, motion, speed, radius}
 -- @return entity id
 function circle(opts) end
 
---- Create a square object
+--- Create a square shape
 -- @param opts table: {x, y, size, color, motion, speed, radius}
 -- @return entity id
 function square(opts) end
 
---- Create a triangle object
+--- Create a triangle shape
 -- @param opts table: {x, y, size, color, motion, speed, radius}
 -- @return entity id
 function triangle(opts) end
@@ -61,7 +61,7 @@ function seed(seed) end
 -- @param fps number
 function fps(fps) end
 
---- Modify an existing object through its ID
+--- Modify an existing entity through its ID
 -- @param id number
 -- @param props table: {x, y, size, color, motion, speed, radius}
 function modify(id, props) end
