@@ -18,11 +18,6 @@ int lua_modify_object(lua_State* L);
 int lua_set_seed(lua_State* L);
 int lua_set_fps(lua_State* L);
 
-//TODO: more lua functions
-//- rectangle
-//- custom motions
-//- color module from C
-
 static inline void setup_lua(lua_State* L)
 {
     lua_register(L, "object", lua_create_object);
