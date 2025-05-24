@@ -15,7 +15,7 @@ end
 
 function spawn(x, y)
     return {
-        id = object({
+        id = shape({
             type = random_shape(),
             x = x,
             y = y,
