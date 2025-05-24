@@ -75,7 +75,7 @@ int main(int argc, char** argv)
 
     if(values.ascii){ 
         values.export = false;
-        view.fps = 30;
+        // view.fps = 120;
     }
 
     bool running = true;
