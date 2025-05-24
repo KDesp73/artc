@@ -25,23 +25,6 @@ circle(300, 300, 20)
 
 ---
 
-### 🎨 C-Based Color Module
-
-Expose efficient color utilities from your C backend:
-
-```lua
-color = rgb(255, 128, 0)
-circle(200, 200, 50):color(color)
-```
-
-Or even:
-
-```lua
-circle(100, 100, 20):color(hsl(30, 0.8, 0.5))
-```
-
----
-
 ### 🔷 High-Level Primitives
 
 #### Spiral
