@@ -65,3 +65,36 @@ function fps(fps) end
 -- @param id number
 -- @param props table: {x, y, size, color, motion, speed, radius}
 function modify(id, props) end
+
+
+--------------------------------------------------------------------------------
+-- Color Module
+--------------------------------------------------------------------------------
+
+--- @class color
+color = {}
+
+--- Create a hex color string from RGB values
+-- Accepts either three numbers (r, g, b) or one table {r=..., g=..., b=...}
+-- @param r number|table: red component or table with r,g,b keys (0-255)
+-- @param g number (optional): green component (0-255)
+-- @param b number (optional): blue component (0-255)
+-- @return string hex color string (e.g. "#FFAABB")
+function color.rgb(r, g, b) end
+
+--- Convert a hex color string (e.g. "#FFAABB") to an RGB table
+-- @param hex string
+-- @return table {r=number, g=number, b=number}
+function color.to_rgb(hex) end
+
+--- Create a hex color string from HSL values
+-- @param h number: hue in degrees (0-360)
+-- @param s number: saturation in percent (0-100)
+-- @param l number: lightness in percent (0-100)
+-- @return string hex color string
+function color.hsl(h, s, l) end
+
+--- Convert a hex color string to an HSL table
+-- @param hex string
+-- @return table {h=number, s=number, l=number}
+function color.to_hsl(hex) end

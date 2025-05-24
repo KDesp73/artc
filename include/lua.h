@@ -33,7 +33,8 @@ int lua_get_time(lua_State* L);
 | Colors          |
 |                 |
 `---------------*/
-int lua_color_to_hex(lua_State* L);
+int lua_rgb_object_to_hex(lua_State* L);
+void register_color_module(lua_State* L);
 
 /*----------------.
 | Modifiers       |
@@ -59,7 +60,8 @@ static inline void setup_lua(lua_State* L)
     lua_register(L, "time", lua_get_time);
     lua_register(L, "rand", lua_get_rand);
 
-    lua_register(L, "hex", lua_color_to_hex);
+    lua_register(L, "hex", lua_rgb_object_to_hex); // NOTE: Kept for backwards compatibility reasons
+    register_color_module(L);
 
     lua_register(L, "clear", lua_clear_scene);
     lua_register(L, "modify", lua_modify_object);
