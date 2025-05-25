@@ -230,3 +230,4 @@ void register_color_module(lua_State* L)
     luaL_newlib(L, colorlib);
     lua_setglobal(L, "color");
 }
+

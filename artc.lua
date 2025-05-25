@@ -66,6 +66,25 @@ function fps(fps) end
 -- @param props table: {x, y, size, color, motion, speed, radius}
 function modify(id, props) end
 
+--- @class palette
+palette = {
+    white = "",
+    black = "",
+    red = "",
+    green = "",
+    blue = "",
+    orange = "",
+    purple = "",
+    yellow = "",
+    pink = "",
+    grey = "",
+    light_blue = "",
+    light_grey = "",
+}
+--- Set the color palette that will be used
+-- @param name string
+function palette(name) end
+
 
 --------------------------------------------------------------------------------
 -- Color Module
