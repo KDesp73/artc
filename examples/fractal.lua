@@ -6,8 +6,8 @@ seed(42)
 fps(30)
 
 local max_depth = 10
-local base_length = 100
-local grow_rate = 1.5  -- seconds per depth level
+local base_length = 150
+local grow_rate = 1.0  -- seconds per depth level
 
 function setup() end
 
