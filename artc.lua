@@ -81,6 +81,7 @@ palette = {
     light_blue = "",
     light_grey = "",
 }
+
 --- Set the color palette that will be used
 -- @param name string
 function palette(name) end
