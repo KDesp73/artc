@@ -35,6 +35,11 @@ function triangle(opts) end
 -- @return entity id
 function line(opts) end
 
+--- Create an image entity
+-- @param opts table: {x, y, w, h, filter, src, motion, radius, speed}
+-- @return entity id
+function image(opts) end
+
 --- Get elapsed time in milliseconds
 -- @return number
 function time() return 0 end
@@ -63,7 +68,7 @@ function fps(fps) end
 
 --- Modify an existing entity through its ID
 -- @param id number
--- @param props table: {x, y, size, color, motion, speed, radius}
+-- @param props table: depends on the type of entity
 function modify(id, props) end
 
 --- @class palette

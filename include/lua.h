@@ -12,6 +12,7 @@ int lua_create_circle(lua_State* L);
 int lua_create_square(lua_State* L);
 int lua_create_triangle(lua_State* L);
 int lua_create_line(lua_State* L);
+int lua_create_image(lua_State* L);
 
 /*----------------.
 | Setters         |
@@ -41,7 +42,7 @@ int lua_set_palette(lua_State* L);
 | Modifiers       |
 |                 |
 `---------------*/
-int lua_modify_object(lua_State* L);
+int lua_modify_entity(lua_State* L);
 int lua_clear_scene(lua_State* L);
 
 
@@ -52,6 +53,7 @@ static inline void setup_lua(lua_State* L)
     lua_register(L, "square", lua_create_square);
     lua_register(L, "triangle", lua_create_triangle);
     lua_register(L, "line", lua_create_line);
+    lua_register(L, "image", lua_create_image);
 
     lua_register(L, "bg", lua_set_background);
     lua_register(L, "window", lua_set_dimensions);
@@ -66,7 +68,7 @@ static inline void setup_lua(lua_State* L)
     lua_register(L, "palette", lua_set_palette);
 
     lua_register(L, "clear", lua_clear_scene);
-    lua_register(L, "modify", lua_modify_object);
+    lua_register(L, "modify", lua_modify_entity);
 }
 
 #endif // ARTC_LUA_H

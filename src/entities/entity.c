@@ -9,10 +9,14 @@ void EntityPaint(ArtEntity* e, View* view)
         case ENTITY_OBJECT:
             ShapePaint(&e->shape, view);
             break;
+        case ENTITY_IMAGE:
+            ImagePaint(&e->image, view);
+            break;
         default:
             break;
     }
 }
+
 void EntityUpdate(ArtEntity* e, float time)
 {
     if(e->kind == ENTITY_LINE) return;

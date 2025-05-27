@@ -26,6 +26,8 @@ typedef enum {
 typedef enum {
     ENTITY_OBJECT,
     ENTITY_LINE,
+    ENTITY_IMAGE,
+    ENTITY_TEXT
 } EntityType;
 
 typedef struct {
@@ -46,11 +48,23 @@ typedef struct {
 } ArtLine;
 
 typedef struct {
+    float x, y;
+    float w, h;
+    char* filter;
+    MotionType motion;
+    float speed;
+    float radius;
+    char* src;
+} ArtImage;
+// TODO: Image should use SDL_Texture
+
+typedef struct {
     int id;
     EntityType kind;
     union {
         ArtShape shape;
         ArtLine line;
+        ArtImage image;
     };
 } ArtEntity;
 
@@ -66,6 +80,8 @@ void ShapePaint(ArtShape* o, View* view);
 void ShapePrint(ArtEntity* e);
 
 void LinePaint(ArtLine* l, View* view);
+
+void ImagePaint(ArtImage* i, View* view);
 
 void EntityPaint(ArtEntity* e, View* view);
 void EntityUpdate(ArtEntity* e, float time);

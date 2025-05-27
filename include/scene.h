@@ -1,6 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include "SDL2/SDL_image.h"
 #include "entities.h"
 
 #define MAX_ENTITIES 4096
@@ -22,8 +23,6 @@ typedef struct {
 
 Scene SceneLoadArt(const char* filename);
 Scene SceneLoadLua(const char* filename, bool sandbox);
-
-
 
 #endif // PARSER_H
 

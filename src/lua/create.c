@@ -1,8 +1,10 @@
+#include "SDL2/SDL_image.h"
 #include "lua/lua.h"
 #include "entities.h"
 #include "lua/lauxlib.h"
 #include "lua.h"
 #include "scene.h"
+#include <stdio.h>
 
 extern Scene scene;
 
@@ -204,6 +206,91 @@ int lua_create_line(lua_State* L)
 
     lua_getfield(L, 1, "thickness");
     line->thickness = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    lua_pushinteger(L, entity->id);
+    return 1;
+}
+
+int lua_create_image(lua_State* L)
+{
+    if (!lua_istable(L, 1))
+        return luaL_error(L, "Expected a table");
+
+    if (scene.count >= MAX_ENTITIES)
+        return luaL_error(L, "Maximum number of entities reached");
+
+    ArtEntity* entity = &scene.entities[scene.count++];
+    ArtImage* image = &entity->image;
+    entity->kind = ENTITY_IMAGE;
+    entity->id = scene.next_id++;
+
+    // Free old strings if any
+    if (image->filter) {
+        free(image->filter);
+        image->filter = NULL;
+    }
+    if (image->src) {
+        free(image->src);
+        image->src = NULL;
+    }
+
+    // x (default 0)
+    lua_getfield(L, 1, "x");
+    image->x = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    // y (default 0)
+    lua_getfield(L, 1, "y");
+    image->y = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    // w (default 0)
+    lua_getfield(L, 1, "w");
+    image->w = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    // h (default 0)
+    lua_getfield(L, 1, "h");
+    image->h = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    // filter (default NULL)
+    lua_getfield(L, 1, "filter");
+    if (lua_isstring(L, -1)) {
+        const char* s = lua_tostring(L, -1);
+        image->filter = strdup(s);
+    }
+    lua_pop(L, 1);
+
+    // motion (default MOTION_STATIC)
+    lua_getfield(L, 1, "motion");
+    if (lua_isstring(L, -1)) {
+        image->motion = ParseMotion(lua_tostring(L, -1));
+    } else {
+        image->motion = MOTION_STATIC;
+    }
+    lua_pop(L, 1);
+
+    // speed (default 0)
+    lua_getfield(L, 1, "speed");
+    image->speed = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    // radius (default 0)
+    lua_getfield(L, 1, "radius");
+    image->radius = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    // src (image path, required)
+    lua_getfield(L, 1, "src");
+    if (lua_isstring(L, -1)) {
+        const char* s = lua_tostring(L, -1);
+        image->src = strdup(s);
+    } else {
+        lua_pop(L, 1);
+        return luaL_error(L, "Image 'src' is required and must be a string");
+    }
     lua_pop(L, 1);
 
     lua_pushinteger(L, entity->id);
