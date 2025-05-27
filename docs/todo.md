@@ -1,16 +1,52 @@
 ## ✅ TODO: API Expansion
 
-### 🔲 Rectangle Primitive
+### Fonts / Typography
+
+```lua
+font("./font.ttf")
+
+char({
+    x = 10, y = 10,
+    size = 20,
+    content = 'C',
+    font = "./another_font.ttf"
+})
+
+text({
+    x = 20, y = 20,
+    size = 10,
+    content = "Hello World",
+})
+
+```
+
+### Images
+
+```lua
+image({
+    x = 10, y = 200,
+    w = 100, h = 100,
+    src = "./image.png",
+    filter = "greyscale"
+})
+```
+
+### Rectangle Primitive
 
 Add support for rectangles:
 
 ```lua
-rect(100, 100, 80, 40)
+rect({
+    x = 100, y = 100, 
+    w = 80, h = 40,
+    color = "#ff00ff",
+    motion = "none"
+})
 ```
 
 ---
 
-### 🔁 Custom Motions
+### Custom Motions
 
 Allow users to define their own motion paths:
 
@@ -19,24 +55,24 @@ function custom_path(t)
   return math.sin(t) * 100, math.cos(t) * 100
 end
 
-circle(300, 300, 20)
+circle({x = 300, y = 300, size = 20})
   :move(custom_path)
 ```
 
 ---
 
-### 🔷 High-Level Primitives
+### High-Level Primitives
 
 #### Spiral
 
 ```lua
-spiral(300, 300, 120, 3, 100)
+spiral({300, 300, 120, 3, 100})
 ```
 
 #### Wave Line
 
 ```lua
-wave_line(100, 300, 500, 300, 10, 20)
+wave_line({100, 300, 500, 300, 10, 20})
 ```
 
 #### Grid
@@ -49,45 +85,7 @@ end)
 
 ---
 
-### 🧠 Built-in Modifiers
-
-#### Pulse
-
-```lua
-circle(200, 200, 40):pulse(2)
-```
-
-#### Orbit
-
-```lua
-circle(0, 0, 10):orbit(200, 200, 100, 1)
-```
-
-#### Wiggle
-
-```lua
-rectangle(300, 300, 60, 30):wiggle(10, 2)
-```
-
----
-
-### 🎛️ Pattern & Palette System
-
-#### Patterns
-
-```lua
-pattern("hexgrid", spacing = 30, radius = 12)
-```
-
-#### Palettes
-
-```lua
-apply_palette("pastel")
-```
-
----
-
-### 🧩 Composable Objects with Tags or Groups
+### Composable Objects with Tags or Groups
 
 ```lua
 g = group()
@@ -101,7 +99,7 @@ g:pulse(1)
 
 ---
 
-### 🎨 Presets
+### Presets
 
 ```lua
 preset("kaleidoscope", {segments = 6})
