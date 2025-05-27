@@ -20,17 +20,6 @@ text({
 
 ```
 
-### Images
-
-```lua
-image({
-    x = 10, y = 200,
-    w = 100, h = 100,
-    src = "./image.png",
-    filter = "greyscale"
-})
-```
-
 ### Rectangle Primitive
 
 Add support for rectangles:
