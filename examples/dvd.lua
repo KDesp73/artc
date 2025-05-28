@@ -1,5 +1,5 @@
 window(800, 800)
-bg("#000000")
+bg("#ffffff")
 fps(30)
 
 local id
@@ -12,7 +12,6 @@ function setup()
         x = x, y = y,
         w = w, h = h,
         src = "./examples/dvd.png",
-        filter = "negative"
     })
 end
 
