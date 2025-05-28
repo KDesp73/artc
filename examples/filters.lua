@@ -20,49 +20,49 @@ function setup()
         x = width * count, y = 0,
         w = width, h = height,
         src = src,
-        filter = "channel-swap"
+        filter = filter.channel_swap
     })
     count = count + 1
     image({
         x = width * count, y = 0,
         w = width, h = height,
         src = src,
-        filter = "greyscale"
+        filter = filter.greyscale
     })
     count = count + 1
     image({
         x = width * count, y = 0,
         w = width, h = height,
         src = src,
-        filter = "negative"
+        filter = filter.negative
     })
     count = 0
     image({
         x = width * count, y = height,
         w = width, h = height,
         src = src,
-        filter = "sepia"
+        filter = filter.sepia
     })
     count = count + 1
     image({
         x = width * count, y = height,
         w = width, h = height,
         src = src,
-        filter = "invert-red"
+        filter = filter.invert_red
     })
     count = count + 1
     image({
         x = width * count, y = height,
         w = width, h = height,
         src = src,
-        filter = "invert-green"
+        filter = filter.invert_green
     })
     count = count + 1
     image({
         x = width * count, y = height,
         w = width, h = height,
         src = src,
-        filter = "invert-blue"
+        filter = filter.invert_blue
     })
     count = count + 1
 

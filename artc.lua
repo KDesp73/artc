@@ -35,6 +35,18 @@ function triangle(opts) end
 -- @return entity id
 function line(opts) end
 
+--- @class filter
+filter = {
+    negative = "negative",
+    greyscale = "greyscale",
+    sepia = "sepia",
+    threshold = "threshold",
+    invert_red = "invert-red",
+    invert_green = "invert-green",
+    invert_blue = "invert-blue",
+    channel_swap = "channel-swap",
+}
+
 --- Create an image entity
 -- @param opts table: {x, y, w, h, filter, src, motion, radius, speed}
 -- @return entity id

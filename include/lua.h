@@ -45,6 +45,8 @@ int lua_set_palette(lua_State* L);
 int lua_modify_entity(lua_State* L);
 int lua_clear_scene(lua_State* L);
 
+void register_filters_table(lua_State* L);
+
 
 static inline void setup_lua(lua_State* L)
 {
@@ -69,6 +71,8 @@ static inline void setup_lua(lua_State* L)
 
     lua_register(L, "clear", lua_clear_scene);
     lua_register(L, "modify", lua_modify_entity);
+
+    register_filters_table(L);
 }
 
 #endif // ARTC_LUA_H
