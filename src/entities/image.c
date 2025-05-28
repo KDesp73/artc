@@ -3,6 +3,150 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
+static void ApplyChannelSwap(SDL_Surface* surface)
+{
+    if (!surface) return;
+    SDL_LockSurface(surface);
+    Uint8* pixels = (Uint8*)surface->pixels;
+    int bpp = surface->format->BytesPerPixel;
+
+    for (int y = 0; y < surface->h; y++) {
+        for (int x = 0; x < surface->w; x++) {
+            Uint8* p = pixels + y * surface->pitch + x * bpp;
+            Uint8 r, g, b, a;
+            SDL_GetRGBA(*(Uint32*)p, surface->format, &r, &g, &b, &a);
+
+            *(Uint32*)p = SDL_MapRGBA(surface->format, b, g, r, a);
+        }
+    }
+
+    SDL_UnlockSurface(surface);
+}
+
+static void ApplyInvertRedFilter(SDL_Surface* surface)
+{
+    if (!surface) return;
+
+    SDL_LockSurface(surface);
+    Uint8* pixels = (Uint8*)surface->pixels;
+    int bpp = surface->format->BytesPerPixel;
+
+    for (int y = 0; y < surface->h; y++) {
+        for (int x = 0; x < surface->w; x++) {
+            Uint8* p = pixels + y * surface->pitch + x * bpp;
+
+            Uint8 r, g, b, a;
+            SDL_GetRGBA(*(Uint32*)p, surface->format, &r, &g, &b, &a);
+
+            r = 255 - r;
+
+            *(Uint32*)p = SDL_MapRGBA(surface->format, r, g, b, a);
+        }
+    }
+
+    SDL_UnlockSurface(surface);
+}
+
+static void ApplyInvertGreenFilter(SDL_Surface* surface)
+{
+    if (!surface) return;
+
+    SDL_LockSurface(surface);
+    Uint8* pixels = (Uint8*)surface->pixels;
+    int bpp = surface->format->BytesPerPixel;
+
+    for (int y = 0; y < surface->h; y++) {
+        for (int x = 0; x < surface->w; x++) {
+            Uint8* p = pixels + y * surface->pitch + x * bpp;
+
+            Uint8 r, g, b, a;
+            SDL_GetRGBA(*(Uint32*)p, surface->format, &r, &g, &b, &a);
+
+            g = 255 - g;
+
+            *(Uint32*)p = SDL_MapRGBA(surface->format, r, g, b, a);
+        }
+    }
+
+    SDL_UnlockSurface(surface);
+}
+
+static void ApplyInvertBlueFilter(SDL_Surface* surface)
+{
+    if (!surface) return;
+
+    SDL_LockSurface(surface);
+    Uint8* pixels = (Uint8*)surface->pixels;
+    int bpp = surface->format->BytesPerPixel;
+
+    for (int y = 0; y < surface->h; y++) {
+        for (int x = 0; x < surface->w; x++) {
+            Uint8* p = pixels + y * surface->pitch + x * bpp;
+
+            Uint8 r, g, b, a;
+            SDL_GetRGBA(*(Uint32*)p, surface->format, &r, &g, &b, &a);
+
+            b = 255 - b;
+
+            *(Uint32*)p = SDL_MapRGBA(surface->format, r, g, b, a);
+        }
+    }
+
+    SDL_UnlockSurface(surface);
+}
+
+
+static void ApplyThresholdFilter(SDL_Surface* surface, Uint8 threshold)
+{
+    if (!surface) return;
+
+    SDL_LockSurface(surface);
+    Uint8* pixels = (Uint8*)surface->pixels;
+    int bpp = surface->format->BytesPerPixel;
+
+    for (int y = 0; y < surface->h; y++) {
+        for (int x = 0; x < surface->w; x++) {
+            Uint8* p = pixels + y * surface->pitch + x * bpp;
+
+            Uint8 r, g, b, a;
+            SDL_GetRGBA(*(Uint32*)p, surface->format, &r, &g, &b, &a);
+
+            Uint8 brightness = (Uint8)(0.3 * r + 0.59 * g + 0.11 * b);
+            Uint8 bw = brightness > threshold ? 255 : 0;
+
+            *(Uint32*)p = SDL_MapRGBA(surface->format, bw, bw, bw, a);
+        }
+    }
+
+    SDL_UnlockSurface(surface);
+}
+
+static void ApplySepiaFilter(SDL_Surface* surface)
+{
+    if (!surface) return;
+
+    SDL_LockSurface(surface);
+    Uint8* pixels = (Uint8*)surface->pixels;
+    int bpp = surface->format->BytesPerPixel;
+
+    for (int y = 0; y < surface->h; y++) {
+        for (int x = 0; x < surface->w; x++) {
+            Uint8* p = pixels + y * surface->pitch + x * bpp;
+
+            Uint8 r, g, b, a;
+            SDL_GetRGBA(*(Uint32*)p, surface->format, &r, &g, &b, &a);
+
+            Uint8 tr = (Uint8)SDL_min(255, 0.393 * r + 0.769 * g + 0.189 * b);
+            Uint8 tg = (Uint8)SDL_min(255, 0.349 * r + 0.686 * g + 0.168 * b);
+            Uint8 tb = (Uint8)SDL_min(255, 0.272 * r + 0.534 * g + 0.131 * b);
+
+            *(Uint32*)p = SDL_MapRGBA(surface->format, tr, tg, tb, a);
+        }
+    }
+
+    SDL_UnlockSurface(surface);
+}
+
 static void ApplyNegativeFilter(SDL_Surface* surface)
 {
     if (!surface) return;
@@ -71,6 +215,18 @@ void ImagePaint(ArtImage* i, View* view)
             ApplyNegativeFilter(image);
         } else if (strcmp(i->filter, "greyscale") == 0 || strcmp(i->filter, "grayscale") == 0) {
             ApplyGreyscaleFilter(image);
+        } else if (strcmp(i->filter, "sepia") == 0) {
+            ApplySepiaFilter(image);
+        } else if (strcmp(i->filter, "threshold") == 0) {
+            ApplyThresholdFilter(image, 128);
+        } else if (strcmp(i->filter, "invert-red") == 0) {
+            ApplyInvertRedFilter(image);
+        } else if (strcmp(i->filter, "invert-green") == 0) {
+            ApplyInvertGreenFilter(image);
+        } else if (strcmp(i->filter, "invert-blue") == 0) {
+            ApplyInvertBlueFilter(image);
+        } else if (strcmp(i->filter, "channel-swap") == 0) {
+            ApplyChannelSwap(image);
         }
     }
 

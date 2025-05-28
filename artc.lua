@@ -123,3 +123,6 @@ function color.hsl(h, s, l) end
 -- @param hex string
 -- @return table {h=number, s=number, l=number}
 function color.to_hsl(hex) end
+
+-- TODO: Implement this method
+function color.random() end

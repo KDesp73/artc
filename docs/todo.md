@@ -95,3 +95,12 @@ preset("kaleidoscope", {segments = 6})
 preset("fireworks")
 preset("lava_lamp")
 ```
+### Preprocessor
+
+```lua
+image({
+    src = "https://images.com/image.png"
+})
+```
+
+The preprocessor should download the image locally, load it and replace the url with the local path
