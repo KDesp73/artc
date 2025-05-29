@@ -37,20 +37,26 @@ function line(opts) end
 
 --- @class filter
 filter = {
-    negative = "negative",
-    greyscale = "greyscale",
-    sepia = "sepia",
-    threshold = "threshold",
-    invert_red = "invert-red",
-    invert_green = "invert-green",
-    invert_blue = "invert-blue",
-    channel_swap = "channel-swap",
+    negative = "",
+    greyscale = "",
+    sepia = "",
+    threshold = "",
+    invert_red = "",
+    invert_green = "",
+    invert_blue = "",
+    channel_swap = "",
 }
 
 --- Create an image entity
 -- @param opts table: {x, y, w, h, filter, src, motion, radius, speed}
 -- @return entity id
 function image(opts) end
+
+--- @class font 
+font = {
+    cozette = "",
+    funky = "",
+}
 
 --- Create a text entity
 -- @param opts table: {x, y, font, size, fg, bg, content}

@@ -10,7 +10,7 @@ function setup()
     text1 = text({
         x = 100, y = 200,
         align = "center",
-        font = "artc:funky",
+        font = font.funky,
         size = base_size,
         fg = palette.yellow,
         bg = palette.black,
@@ -20,7 +20,7 @@ function setup()
     text2 = text({
         x = 400, y = 500,
         align = "center",
-        font = "artc:cozette",
+        font = font.cozette,
         size = base_size,
         fg = palette.green,
         bg = palette.black,
