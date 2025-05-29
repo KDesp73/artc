@@ -10,6 +10,9 @@ void register_fonts_table(lua_State* L)
     lua_pushstring(L, "artc:funky");
     lua_setfield(L, -2, "funky");
 
+    lua_pushstring(L, "artc:aovel");
+    lua_setfield(L, -2, "aovel");
+
     lua_setglobal(L, "font");
 }
 

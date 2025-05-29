@@ -56,6 +56,7 @@ function image(opts) end
 font = {
     cozette = "",
     funky = "",
+    aovel = "",
 }
 
 --- Create a text entity

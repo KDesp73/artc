@@ -1,4 +1,5 @@
 #include "SDL2/SDL_ttf.h"
+#include "assets/AovelSansRounded-rdDL.h"
 #include "assets/SuperFunky-lgmWw.h"
 #include "entities.h"
 #include "assets/CozetteCrossedSevenVector.h"
@@ -12,6 +13,10 @@ TTF_Font* LoadFontFromMemory(const char* name, int size)
         return TTF_OpenFontRW(rw, 1, size);
     } else if (strcmp(name, "artc:funky") == 0) {
         SDL_RWops* rw = SDL_RWFromConstMem(__assets_SuperFunky_lgmWw_ttf, __assets_SuperFunky_lgmWw_ttf_len);
+        if (!rw) return NULL;
+        return TTF_OpenFontRW(rw, 1, size);
+    } else if (strcmp(name, "artc:aovel") == 0) {
+        SDL_RWops* rw = SDL_RWFromConstMem(__assets_AovelSansRounded_rdDL_ttf, __assets_AovelSansRounded_rdDL_ttf_len);
         if (!rw) return NULL;
         return TTF_OpenFontRW(rw, 1, size);
     }
