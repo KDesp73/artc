@@ -27,12 +27,7 @@ Scene SceneLoadLua(const char* filename, bool sandbox)
 
     char* buffer = load_file(filename);
     char tmp_path[256];
-    const char* lua_path = ReplaceLinks(buffer, tmp_path);
-    if(!lua_path) {
-        ERRO("Preprocessor error");
-        return scene;
-    }
-
+    ReplaceLinks(buffer, tmp_path);
 
     lua_State* L = luaL_newstate();
     if(sandbox){
@@ -58,7 +53,7 @@ Scene SceneLoadLua(const char* filename, bool sandbox)
 
     setup_lua(L);
 
-    if (luaL_loadfile(L, lua_path) != LUA_OK) {
+    if (luaL_loadfile(L, tmp_path) != LUA_OK) {
         ERRO("Lua load error: %s", lua_tostring(L, -1));
         lua_pop(L, 1);
         return scene;
