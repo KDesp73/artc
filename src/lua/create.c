@@ -296,3 +296,78 @@ int lua_create_image(lua_State* L)
     lua_pushinteger(L, entity->id);
     return 1;
 }
+
+int lua_create_text(lua_State* L)
+{
+    if (!lua_istable(L, 1))
+        return luaL_error(L, "Expected a table");
+
+    if (scene.count >= MAX_ENTITIES)
+        return luaL_error(L, "Maximum number of entities reached");
+
+    ArtEntity* entity = &scene.entities[scene.count++];
+    ArtText* text = &entity->text;
+    entity->kind = ENTITY_TEXT;
+    entity->id = scene.next_id++;
+
+    // Free old strings if any
+    if (text->font) {
+        free(text->font);
+        text->font = NULL;
+    }
+    if (text->content) {
+        free(text->content);
+        text->content = NULL;
+    }
+
+    // x (default 0)
+    lua_getfield(L, 1, "x");
+    text->x = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    // y (default 0)
+    lua_getfield(L, 1, "y");
+    text->y = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    // size (default 12)
+    lua_getfield(L, 1, "size");
+    text->font_size = lua_isnumber(L, -1) ? (size_t)lua_tointeger(L, -1) : 12;
+    lua_pop(L, 1);
+
+    // font (default NULL)
+    lua_getfield(L, 1, "font");
+    if (lua_isstring(L, -1)) {
+        const char* s = lua_tostring(L, -1);
+        text->font = strdup(s);
+    } else {
+        text->font = NULL;
+    }
+    lua_pop(L, 1);
+
+    // fg (default "#ffffff")
+    lua_getfield(L, 1, "fg");
+    const char* fg_str = lua_isstring(L, -1) ? lua_tostring(L, -1) : "#ffffff";
+    text->fg = ParseHexColor(fg_str);
+    lua_pop(L, 1);
+
+    // bg (default "#000000")
+    lua_getfield(L, 1, "bg");
+    const char* bg_str = lua_isstring(L, -1) ? lua_tostring(L, -1) : "#000000";
+    text->bg = ParseHexColor(bg_str);
+    lua_pop(L, 1);
+
+    // content (required)
+    lua_getfield(L, 1, "content");
+    if (lua_isstring(L, -1)) {
+        const char* s = lua_tostring(L, -1);
+        text->content = strdup(s);
+    } else {
+        lua_pop(L, 1);
+        return luaL_error(L, "Text 'content' is required and must be a string");
+    }
+    lua_pop(L, 1);
+
+    lua_pushinteger(L, entity->id);
+    return 1;
+}

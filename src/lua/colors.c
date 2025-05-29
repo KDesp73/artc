@@ -2,6 +2,7 @@
 #include "lua/lua.h"
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 #include <string.h>
 
 static int clamp(int v)
@@ -217,6 +218,18 @@ static int lua_to_hsl(lua_State* L)
     return 1;
 }
 
+static int lua_color_random(lua_State* L)
+{
+    int r = rand() % 256;
+    int g = rand() % 256;
+    int b = rand() % 256;
+
+    char hex[8];
+    snprintf(hex, sizeof(hex), "#%02X%02X%02X", r, g, b);
+    lua_pushstring(L, hex);
+    return 1;
+}
+
 void register_color_module(lua_State* L)
 {
     static const struct luaL_Reg colorlib[] = {
@@ -224,6 +237,7 @@ void register_color_module(lua_State* L)
         {"to_rgb", lua_to_rgb},
         {"hsl", lua_hsl},
         {"to_hsl", lua_to_hsl},
+        {"random", lua_color_random},
         {NULL, NULL}
     };
 

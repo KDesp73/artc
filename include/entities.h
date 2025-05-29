@@ -2,7 +2,8 @@
 #define ART_OBJECT_H
 
 #include "view.h"
-#include <SDL2/SDL.h>
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_ttf.h"
 
 typedef enum {
     MOTION_STATIC,
@@ -59,12 +60,21 @@ typedef struct {
 // TODO: Image should use SDL_Texture
 
 typedef struct {
+    float x, y;
+    size_t font_size;
+    SDL_Color fg, bg;
+    char* font;
+    char* content;
+} ArtText;
+
+typedef struct {
     int id;
     EntityType kind;
     union {
         ArtShape shape;
         ArtLine line;
         ArtImage image;
+        ArtText text;
     };
 } ArtEntity;
 
@@ -82,6 +92,8 @@ void ShapePrint(ArtEntity* e);
 void LinePaint(ArtLine* l, View* view);
 
 void ImagePaint(ArtImage* i, View* view);
+
+void TextPaint(ArtText* t, View* view);
 
 void EntityPaint(ArtEntity* e, View* view);
 void EntityUpdate(ArtEntity* e, float time);

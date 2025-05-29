@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include <string.h>
 #include "SDL2/SDL_surface.h"
+#include "SDL2/SDL_ttf.h"
 #include "io/ansi.h"
 #include "io/logging.h"
 #include "scene.h"
@@ -17,6 +18,7 @@ bool ViewInit(View* view)
         ERRO("SDL_Init Error: %s\n", SDL_GetError());
         return false;
     }
+    TTF_Init();
 
     // Default values
     if(view->width == 0) view->width = DEFAULT_WIDTH;
@@ -63,6 +65,7 @@ void ViewFree(View* view)
     if (view->surface) SDL_FreeSurface(view->surface);
     if (view->renderer) SDL_DestroyRenderer(view->renderer);
     if (view->window) SDL_DestroyWindow(view->window);
+    TTF_Quit();
     SDL_Quit();
     if(view->L)
         lua_close(view->L);

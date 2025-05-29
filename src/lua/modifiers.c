@@ -151,6 +151,50 @@ int lua_modify_entity(lua_State* L)
             // You might want to reload the texture here after changing the src
         }
         lua_pop(L, 1);
+    } else if (entity->kind == ENTITY_TEXT) {
+        ArtText* text = &entity->text;
+
+        lua_getfield(L, 2, "x");
+        if (lua_isnumber(L, -1)) text->x = (float)lua_tonumber(L, -1);
+        lua_pop(L, 1);
+
+        lua_getfield(L, 2, "y");
+        if (lua_isnumber(L, -1)) text->y = (float)lua_tonumber(L, -1);
+        lua_pop(L, 1);
+
+        lua_getfield(L, 2, "size");
+        if (lua_isnumber(L, -1)) text->font_size = (size_t)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+
+        lua_getfield(L, 2, "font");
+        if (lua_isstring(L, -1)) {
+            const char* font_str = lua_tostring(L, -1);
+            if (text->font) free(text->font);
+            text->font = strdup(font_str);
+        }
+        lua_pop(L, 1);
+
+        lua_getfield(L, 2, "fg");
+        if (lua_isstring(L, -1)) {
+            const char* fg_str = lua_tostring(L, -1);
+            text->fg = ParseHexColor(fg_str);
+        }
+        lua_pop(L, 1);
+
+        lua_getfield(L, 2, "bg");
+        if (lua_isstring(L, -1)) {
+            const char* bg_str = lua_tostring(L, -1);
+            text->bg = ParseHexColor(bg_str);
+        }
+        lua_pop(L, 1);
+
+        lua_getfield(L, 2, "content");
+        if (lua_isstring(L, -1)) {
+            const char* content_str = lua_tostring(L, -1);
+            if (text->content) free(text->content);
+            text->content = strdup(content_str);
+        }
+        lua_pop(L, 1);
     } else {
         return luaL_error(L, "Unknown entity type");
     }

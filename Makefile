@@ -2,7 +2,7 @@
 CC = gcc
 INCLUDE = -Iinclude -Ideps/include
 CFLAGS = -Wall -fPIC $(INCLUDE)
-LDFLAGS = -Ldeps/lib -lSDL2 -lSDL2_image -lm -l:liblua.a
+LDFLAGS = -Ldeps/lib -lSDL2 -lSDL2_ttf -lSDL2_image -lm -l:liblua.a
 
 # Directories
 SRC_DIR = src
@@ -60,6 +60,7 @@ $(BUILD_DIR): ## Create the build directory if it doesn't exist
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(BUILD_DIR)/lua
 	mkdir -p $(BUILD_DIR)/entities
+	mkdir -p $(BUILD_DIR)/assets
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c ## Compile source files with progress
 	$(eval counter=$(shell echo $$(($(counter)+1))))

@@ -12,6 +12,9 @@ void EntityPaint(ArtEntity* e, View* view)
         case ENTITY_IMAGE:
             ImagePaint(&e->image, view);
             break;
+        case ENTITY_TEXT:
+            TextPaint(&e->text, view);
+            break;
         default:
             break;
     }

@@ -13,6 +13,7 @@ int lua_create_square(lua_State* L);
 int lua_create_triangle(lua_State* L);
 int lua_create_line(lua_State* L);
 int lua_create_image(lua_State* L);
+int lua_create_text(lua_State* L);
 
 /*----------------.
 | Setters         |
@@ -56,6 +57,7 @@ static inline void setup_lua(lua_State* L)
     lua_register(L, "triangle", lua_create_triangle);
     lua_register(L, "line", lua_create_line);
     lua_register(L, "image", lua_create_image);
+    lua_register(L, "text", lua_create_text);
 
     lua_register(L, "bg", lua_set_background);
     lua_register(L, "window", lua_set_dimensions);

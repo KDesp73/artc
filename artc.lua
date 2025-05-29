@@ -52,6 +52,11 @@ filter = {
 -- @return entity id
 function image(opts) end
 
+--- Create a text entity
+-- @param opts table: {x, y, font, size, fg, bg, content}
+-- @return entity id
+function text(opts) end
+
 --- Get elapsed time in milliseconds
 -- @return number
 function time() return 0 end
@@ -136,5 +141,6 @@ function color.hsl(h, s, l) end
 -- @return table {h=number, s=number, l=number}
 function color.to_hsl(hex) end
 
--- TODO: Implement this method
+--- Returns a random color in hex format
+-- @return string
 function color.random() end
