@@ -9,7 +9,6 @@ local text1, text2
 function setup()
     text1 = text({
         x = 100, y = 200,
-        align = "center",
         font = font.funky,
         size = base_size,
         fg = palette.yellow,
@@ -19,7 +18,6 @@ function setup()
 
     text2 = text({
         x = 400, y = 500,
-        align = "center",
         font = font.cozette,
         size = base_size,
         fg = palette.green,
