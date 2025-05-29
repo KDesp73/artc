@@ -1,25 +1,5 @@
 ## ✅ TODO: API Expansion
 
-### Fonts / Typography
-
-```lua
-font("./font.ttf")
-
-char({
-    x = 10, y = 10,
-    size = 20,
-    content = 'C',
-    font = "./another_font.ttf"
-})
-
-text({
-    x = 20, y = 20,
-    size = 10,
-    content = "Hello World",
-})
-
-```
-
 ### Rectangle Primitive
 
 Add support for rectangles:
@@ -95,12 +75,3 @@ preset("kaleidoscope", {segments = 6})
 preset("fireworks")
 preset("lava_lamp")
 ```
-### Preprocessor
-
-```lua
-image({
-    src = "https://images.com/image.png"
-})
-```
-
-The preprocessor should download the image locally, load it and replace the url with the local path
