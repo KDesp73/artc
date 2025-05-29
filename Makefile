@@ -2,7 +2,7 @@
 CC = gcc
 INCLUDE = -Iinclude -Ideps/include
 CFLAGS = -Wall -fPIC $(INCLUDE)
-LDFLAGS = -Ldeps/lib -lSDL2 -lSDL2_ttf -lSDL2_image -lm -l:liblua.a
+LDFLAGS = -Ldeps/lib -lSDL2 -lSDL2_ttf -lSDL2_image -lm -l:liblua.a -lmagic
 
 # Directories
 SRC_DIR = src

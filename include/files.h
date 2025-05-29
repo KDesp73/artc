@@ -11,6 +11,39 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+static inline char* load_file(const char* path)
+{
+    FILE* file = fopen(path, "rb");
+    if (!file) {
+        fprintf(stderr, "Failed to open file: %s\n", path);
+        return NULL;
+    }
+
+    // Seek to end to get file size
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file);
+    rewind(file);
+
+    if (length < 0) {
+        fclose(file);
+        return NULL;
+    }
+
+    // Allocate buffer (+1 for null terminator)
+    char* buffer = (char*)malloc(length + 1);
+    if (!buffer) {
+        fclose(file);
+        return NULL;
+    }
+
+    // Read file into buffer
+    size_t read = fread(buffer, 1, length, file);
+    buffer[read] = '\0';
+
+    fclose(file);
+    return buffer;
+}
+
 // Check if the path is a file
 static inline bool is_file(const char* path) 
 {

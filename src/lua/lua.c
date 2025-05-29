@@ -1,9 +1,11 @@
 #include "lua/lua.h"
+#include "files.h"
 #include "io/logging.h"
 #include "lua/lauxlib.h"
 #include "lua/lualib.h"
 #include "lua.h"
 #include "scene.h"
+#include "preprocessor.h"
 #include "view.h"
 
 extern Scene scene;
@@ -22,6 +24,15 @@ Scene SceneLoadLua(const char* filename, bool sandbox)
     scene.options.width = 640;
     scene.options.height = 480;
     scene.options.background = (SDL_Color){0, 0, 0, 255};
+
+    char* buffer = load_file(filename);
+    char tmp_path[256];
+    const char* lua_path = ReplaceLinks(buffer, tmp_path);
+    if(!lua_path) {
+        ERRO("Preprocessor error");
+        return scene;
+    }
+
 
     lua_State* L = luaL_newstate();
     if(sandbox){
@@ -47,7 +58,7 @@ Scene SceneLoadLua(const char* filename, bool sandbox)
 
     setup_lua(L);
 
-    if (luaL_loadfile(L, filename) != LUA_OK) {
+    if (luaL_loadfile(L, lua_path) != LUA_OK) {
         ERRO("Lua load error: %s", lua_tostring(L, -1));
         lua_pop(L, 1);
         return scene;
