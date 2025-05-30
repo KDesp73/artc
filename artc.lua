@@ -67,6 +67,10 @@ font = {
     cozette = "",
     funky = "",
     aovel = "",
+    xfiles = "",
+    xfiles_1 = "",
+    movistar = "",
+    fox = "",
 }
 
 --- Create a text entity
@@ -91,6 +95,9 @@ function hex(rgb) return "" end
 
 --- Clears the scene
 function clear() end
+
+--- Sleeps for ms time
+function wait(ms) end
 
 --- Set the seed
 -- @param seed number

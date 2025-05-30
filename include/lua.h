@@ -47,6 +47,8 @@ int lua_set_palette(lua_State* L);
 `---------------*/
 int lua_modify_entity(lua_State* L);
 int lua_clear_scene(lua_State* L);
+int lua_wait(lua_State* L);
+
 
 /*----------------.
 | Tables          |
@@ -80,6 +82,7 @@ static inline void setup_lua(lua_State* L)
     register_color_module(L);
     lua_register(L, "palette", lua_set_palette);
 
+    lua_register(L, "wait", lua_wait);
     lua_register(L, "clear", lua_clear_scene);
     lua_register(L, "modify", lua_modify_entity);
 

@@ -1,8 +1,9 @@
-TODO: color.rgba
 TODO: destroy function
-TODO: rect()
-TODO: elipses()
 TODO: custom motions
 TODO: groups
 TODO: presets
 TODO: high level primitives (spiral, wave, grid)
+TODO: polygon()
+DONE: color.rgba
+DONE: rect()
+DONE: elipses()

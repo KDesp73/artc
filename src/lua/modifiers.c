@@ -211,3 +211,13 @@ int lua_clear_scene(lua_State* L)
     scene.count = 0;
     return 0;
 }
+
+int lua_wait(lua_State* L)
+{
+    int ms = luaL_checkinteger(L, 1);
+    if (ms < 0) ms = 0;
+
+    SDL_Delay(ms);
+
+    return 0; // no return values for Lua
+}
