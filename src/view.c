@@ -42,13 +42,6 @@ bool ViewInit(View* view)
         return false;
     }
 
-    view->surface = SDL_CreateRGBSurfaceWithFormat(0, view->width, view->height, 32, SDL_PIXELFORMAT_RGBA32);
-    if (!view->surface) {
-        ERRO("SDL_CreateRGBSurfaceWithFormat Error: %s\n", SDL_GetError());
-        ViewFree(view);
-        return false;
-    }
-
     view->texture = SDL_CreateTexture(view->renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, view->width, view->height);
     if (!view->texture) {
         ERRO("SDL_CreateTexture Error: %s\n", SDL_GetError());
@@ -62,7 +55,6 @@ bool ViewInit(View* view)
 void ViewFree(View* view)
 {
     if (view->texture) SDL_DestroyTexture(view->texture);
-    if (view->surface) SDL_FreeSurface(view->surface);
     if (view->renderer) SDL_DestroyRenderer(view->renderer);
     if (view->window) SDL_DestroyWindow(view->window);
     TTF_Quit();
@@ -74,28 +66,9 @@ void ViewFree(View* view)
 
 void ViewRender(View* view)
 {
-    SDL_UpdateTexture(view->texture, NULL, view->surface->pixels, view->surface->pitch);
     SDL_RenderClear(view->renderer);
     SDL_RenderCopy(view->renderer, view->texture, NULL, NULL);
     SDL_RenderPresent(view->renderer);
-}
-
-static Uint32 get_pixel(SDL_Surface* surface, int x, int y)
-{
-    int bpp = surface->format->BytesPerPixel;
-    Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
-
-    switch (bpp) {
-        case 1: return *p;
-        case 2: return *(Uint16*)p;
-        case 3:
-            if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-                return p[0] << 16 | p[1] << 8 | p[2];
-            else
-                return p[0] | p[1] << 8 | p[2] << 16;
-        case 4: return *(Uint32*)p;
-        default: return 0;
-    }
 }
 
 #define TERM_COLS 80
@@ -112,21 +85,32 @@ static void get_terminal_size(int* rows, int* cols)
     }
 }
 
-static void RenderSurfaceToTerminal(SDL_Surface* surface)
+static void RenderRendererToTerminal(SDL_Renderer* renderer, int width, int height)
 {
     const char* charset = " .:-=+*#%@";
     int charset_len = strlen(charset);
 
-    int surf_w = surface->w;
-    int surf_h = surface->h;
     int rows, cols;
     get_terminal_size(&rows, &cols);
 
-    int px_per_col = surf_w / cols;
-    int px_per_row = surf_h / rows;
+    int px_per_col = width / cols;
+    int px_per_row = height / rows;
 
     if (px_per_col < 1) px_per_col = 1;
     if (px_per_row < 1) px_per_row = 1;
+
+    size_t buffer_size = width * height * 4;
+    Uint8* pixels = malloc(buffer_size);
+    if (!pixels) {
+        fprintf(stderr, "Failed to allocate pixel buffer\n");
+        return;
+    }
+
+    if (SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_RGBA32, pixels, width * 4) != 0) {
+        fprintf(stderr, "SDL_RenderReadPixels failed: %s\n", SDL_GetError());
+        free(pixels);
+        return;
+    }
 
     ANSI_HIDE_CURSOR();
     printf("\033[H\033[J");
@@ -136,9 +120,10 @@ static void RenderSurfaceToTerminal(SDL_Surface* surface)
             int x = col * px_per_col;
             int y = row * px_per_row;
 
-            Uint32 pixel = get_pixel(surface, x, y);
-            Uint8 r, g, b;
-            SDL_GetRGB(pixel, surface->format, &r, &g, &b);
+            int index = (y * width + x) * 4;
+            Uint8 r = pixels[index + 0];
+            Uint8 g = pixels[index + 1];
+            Uint8 b = pixels[index + 2];
 
             float brightness = (0.2126f * r + 0.7152f * g + 0.0722f * b) / 255.0f;
             int char_index = (int)(brightness * (charset_len - 1));
@@ -148,11 +133,12 @@ static void RenderSurfaceToTerminal(SDL_Surface* surface)
         }
         printf("\n");
     }
+
     fflush(stdout);
+    free(pixels);
 }
 
 void ViewRenderAscii(View* view)
 {
-    SDL_Surface* surface = view->surface;
-    RenderSurfaceToTerminal(surface);
+    RenderRendererToTerminal(view->renderer, view->width, view->height);
 }

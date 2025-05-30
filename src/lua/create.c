@@ -31,6 +31,16 @@ int lua_create_object(lua_State* L)
     obj->y = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
     lua_pop(L, 1);
 
+    // w (default 0)
+    lua_getfield(L, 1, "w");
+    obj->w = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    // h (default 0)
+    lua_getfield(L, 1, "h");
+    obj->h = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
     // size (default 10)
     lua_getfield(L, 1, "size");
     obj->size = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 10.0f;
@@ -105,6 +115,16 @@ static int create_object(lua_State* L, ShapeType type)
     obj->y = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
     lua_pop(L, 1);
 
+    // w (default 0)
+    lua_getfield(L, 1, "w");
+    obj->w = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
+    // h (default 0)
+    lua_getfield(L, 1, "h");
+    obj->h = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0.0f;
+    lua_pop(L, 1);
+
     // size (default 10)
     lua_getfield(L, 1, "size");
     obj->size = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 10.0f;
@@ -160,6 +180,15 @@ int lua_create_triangle(lua_State* L)
     return create_object(L, SHAPE_TRIANGLE);
 }
 
+int lua_create_rectangle(lua_State* L)
+{
+    return create_object(L, SHAPE_RECTANGLE);
+}
+
+int lua_create_ellipse(lua_State* L)
+{
+    return create_object(L, SHAPE_ELLIPSE);
+}
 int lua_create_line(lua_State* L)
 {
     if (!lua_istable(L, 1))

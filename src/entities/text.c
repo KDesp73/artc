@@ -25,32 +25,46 @@ TTF_Font* LoadFontFromMemory(const char* name, int size)
 
 void TextPaint(ArtText* t, View* view)
 {
-    if (!t || !t->content || !t->font) return;
+    if (!t || !t->content || !t->font || !view || !view->renderer) return;
 
     TTF_Font* font = LoadFontFromMemory(t->font, t->font_size);
-    if(!font) font = TTF_OpenFont(t->font, (int)t->font_size);
+    if (!font) font = TTF_OpenFont(t->font, (int)t->font_size);
     if (!font) {
         fprintf(stderr, "Failed to load font %s: %s\n", t->font, TTF_GetError());
         return;
     }
 
-    SDL_Surface* text_surface = (!t->blend) 
-        ? TTF_RenderText_Shaded(font, t->content, t->fg, t->bg)
-        : TTF_RenderText_Blended(font, t->content, t->fg);
+    SDL_Surface* text_surface = NULL;
+    if (!t->blend) {
+        text_surface = TTF_RenderText_Shaded(font, t->content, t->fg, t->bg);
+    } else {
+        text_surface = TTF_RenderText_Blended(font, t->content, t->fg);
+    }
+    
     if (!text_surface) {
         fprintf(stderr, "Failed to render text: %s\n", TTF_GetError());
         TTF_CloseFont(font);
         return;
     }
 
-    SDL_Rect dst;
-    dst.x = (int)t->x;
-    dst.y = (int)t->y;
-    dst.w = text_surface->w;
-    dst.h = text_surface->h;
+    SDL_Texture* text_texture = SDL_CreateTextureFromSurface(view->renderer, text_surface);
+    if (!text_texture) {
+        fprintf(stderr, "Failed to create texture: %s\n", SDL_GetError());
+        SDL_FreeSurface(text_surface);
+        TTF_CloseFont(font);
+        return;
+    }
 
-    SDL_BlitSurface(text_surface, NULL, view->surface, &dst);
+    SDL_Rect dst = {
+        .x = (int)t->x,
+        .y = (int)t->y,
+        .w = text_surface->w,
+        .h = text_surface->h
+    };
 
+    SDL_RenderCopy(view->renderer, text_texture, NULL, &dst);
+
+    SDL_DestroyTexture(text_texture);
     SDL_FreeSurface(text_surface);
     TTF_CloseFont(font);
 }

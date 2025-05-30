@@ -23,6 +23,8 @@ typedef enum {
     SHAPE_SQUARE,
     SHAPE_CIRCLE,
     SHAPE_TRIANGLE,
+    SHAPE_RECTANGLE,
+    SHAPE_ELLIPSE,
 } ShapeType;
 
 typedef enum {
@@ -36,6 +38,7 @@ typedef struct {
     float x, y;
     float cx, cy;
     float size;
+    float w, h;
     SDL_Color color;
     MotionType motion;
     ShapeType type;

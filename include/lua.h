@@ -11,6 +11,8 @@ int lua_create_object(lua_State* L);
 int lua_create_circle(lua_State* L);
 int lua_create_square(lua_State* L);
 int lua_create_triangle(lua_State* L);
+int lua_create_rectangle(lua_State* L);
+int lua_create_ellipse(lua_State* L);
 int lua_create_line(lua_State* L);
 int lua_create_image(lua_State* L);
 int lua_create_text(lua_State* L);
@@ -60,6 +62,8 @@ static inline void setup_lua(lua_State* L)
     lua_register(L, "circle", lua_create_circle);
     lua_register(L, "square", lua_create_square);
     lua_register(L, "triangle", lua_create_triangle);
+    lua_register(L, "rectangle", lua_create_rectangle);
+    lua_register(L, "ellipse", lua_create_ellipse);
     lua_register(L, "line", lua_create_line);
     lua_register(L, "image", lua_create_image);
     lua_register(L, "text", lua_create_text);

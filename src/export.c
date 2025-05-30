@@ -15,27 +15,39 @@ void Export(const char* format, const char* output, size_t fps)
 
 }
 
-void SaveFrameToPPM(const char* filename, int width, int height, SDL_Surface* surface)
+void SaveFrameToPPM(const char* filename, View* view)
 {
+    if (!filename || !view || !view->renderer) return;
+
+    int width, height;
+    SDL_GetRendererOutputSize(view->renderer, &width, &height);
+
+    Uint8* pixels = malloc(width * height * 4);
+    if (!pixels) return;
+
+    if (SDL_RenderReadPixels(view->renderer, NULL, SDL_PIXELFORMAT_RGBA8888, pixels, width * 4) != 0) {
+        fprintf(stderr, "SDL_RenderReadPixels failed: %s\n", SDL_GetError());
+        free(pixels);
+        return;
+    }
+
     FILE* f = fopen(filename, "wb");
-    if (!f) return;
+    if (!f) {
+        free(pixels);
+        return;
+    }
 
     fprintf(f, "P6\n%d %d\n255\n", width, height);
 
-    Uint8* pixels = (Uint8*)surface->pixels;
-    int pitch = surface->pitch;
-
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            Uint8* p = pixels + y * pitch + x * 4;
-            Uint8 r = p[0];
-            Uint8 g = p[1];
-            Uint8 b = p[2];
-            fwrite(&r, 1, 1, f);
-            fwrite(&g, 1, 1, f);
-            fwrite(&b, 1, 1, f);
+            Uint8* p = pixels + y * width * 4 + x * 4;
+            fwrite(&p[0], 1, 1, f); // R
+            fwrite(&p[1], 1, 1, f); // G
+            fwrite(&p[2], 1, 1, f); // B
         }
     }
 
     fclose(f);
+    free(pixels);
 }

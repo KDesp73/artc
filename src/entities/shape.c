@@ -55,62 +55,122 @@ void ShapeUpdate(ArtShape* o, float time)
 
 void ShapePaint(ArtShape* o, View* view)
 {
-    Uint32 color = SDL_MapRGBA(view->surface->format, o->color.r, o->color.g, o->color.b, 255);
+    SDL_Renderer* renderer = view->renderer;
+
+    Uint8 r = o->color.r;
+    Uint8 g = o->color.g;
+    Uint8 b = o->color.b;
+    Uint8 a = 255;
+
+    SDL_SetRenderDrawColor(renderer, r, g, b, a);
 
     if (o->type == SHAPE_SQUARE) {
         SDL_Rect r = { (int)o->x, (int)o->y, (int)o->size, (int)o->size };
-        SDL_FillRect(view->surface, &r, color);
-    } else if (o->type == SHAPE_CIRCLE) {
-        int cx = (int)o->x;
-        int cy = (int)o->y;
-        int r = (int)o->size;
-        Uint32* pixels = (Uint32*)view->surface->pixels;
-        int pitch = view->surface->pitch / 4;
+        SDL_RenderFillRect(renderer, &r);
 
-        for (int y = -r; y <= r; y++) {
-            for (int x = -r; x <= r; x++) {
-                if (x*x + y*y <= r*r) {
-                    int px = cx + x;
-                    int py = cy + y;
-                    if (px >= 0 && px < view->width && py >= 0 && py < view->height) {
-                        pixels[py * pitch + px] = color;
-                    }
-                }
-            }
-        }
+    } else if (o->type == SHAPE_RECTANGLE) {
+        SDL_Rect r = { (int)o->x, (int)o->y, (int)o->w, (int)o->h };
+        SDL_RenderFillRect(renderer, &r);
+
     } else if (o->type == SHAPE_TRIANGLE) {
-        int cx = (int)o->x;
-        int cy = (int)o->y;
-        int size = (int)o->size;
-        Uint32* pixels = (Uint32*)view->surface->pixels;
-        int pitch = view->surface->pitch / 4;
+        float cx = o->x;
+        float cy = o->y;
+        float half_w = o->w / 2.0f;
+        float h = o->h;
 
-        for (int y = 0; y < size; y++) {
-            int start_x = cx - y / 2;
-            int end_x = cx + y / 2;
-            int py = cy + y;
-            for (int px = start_x; px <= end_x; px++) {
-                if (px >= 0 && px < view->width && py >= 0 && py < view->height) {
-                    pixels[py * pitch + px] = color;
-                }
-            }
+        SDL_Vertex vertices[3];
+
+        vertices[0].position.x = cx;
+        vertices[0].position.y = cy;
+        vertices[0].color.r = r;
+        vertices[0].color.g = g;
+        vertices[0].color.b = b;
+        vertices[0].color.a = a;
+        vertices[0].tex_coord.x = 0;
+        vertices[0].tex_coord.y = 0;
+
+        vertices[1].position.x = cx - half_w;
+        vertices[1].position.y = cy + h;
+        vertices[1].color = vertices[0].color;
+        vertices[1].tex_coord = vertices[0].tex_coord;
+
+        vertices[2].position.x = cx + half_w;
+        vertices[2].position.y = cy + h;
+        vertices[2].color = vertices[0].color;
+        vertices[2].tex_coord = vertices[0].tex_coord;
+
+        SDL_RenderGeometry(renderer, NULL, vertices, 3, NULL, 0);
+
+    } else if (o->type == SHAPE_CIRCLE) {
+        // Approximate circle by polygon of many vertices
+
+        const int num_segments = 40;
+        SDL_Vertex vertices[num_segments];
+        float cx = o->x;
+        float cy = o->y;
+        float radius = o->size;
+
+        for (int i = 0; i < num_segments; i++) {
+            float theta = (2.0f * M_PI * i) / num_segments;
+            vertices[i].position.x = cx + radius * cosf(theta);
+            vertices[i].position.y = cy + radius * sinf(theta);
+            vertices[i].color.r = r;
+            vertices[i].color.g = g;
+            vertices[i].color.b = b;
+            vertices[i].color.a = a;
+            vertices[i].tex_coord.x = 0;
+            vertices[i].tex_coord.y = 0;
+        }
+
+        // Draw triangle fan
+        for (int i = 1; i < num_segments - 1; i++) {
+            SDL_Vertex tri[3] = { vertices[0], vertices[i], vertices[i+1] };
+            SDL_RenderGeometry(renderer, NULL, tri, 3, NULL, 0);
+        }
+
+    } else if (o->type == SHAPE_ELLIPSE) {
+        // Approximate ellipse like circle but scale x and y separately
+
+        const int num_segments = 40;
+        SDL_Vertex vertices[num_segments];
+        float cx = o->x;
+        float cy = o->y;
+        float a = o->w / 2.0f;
+        float b = o->h / 2.0f;
+
+        for (int i = 0; i < num_segments; i++) {
+            float theta = (2.0f * M_PI * i) / num_segments;
+            vertices[i].position.x = cx + a * cosf(theta);
+            vertices[i].position.y = cy + b * sinf(theta);
+            vertices[i].color.r = r;
+            vertices[i].color.g = g;
+            vertices[i].color.b = b;
+            vertices[i].color.a = a;
+            vertices[i].tex_coord.x = 0;
+            vertices[i].tex_coord.y = 0;
+        }
+
+        for (int i = 1; i < num_segments - 1; i++) {
+            SDL_Vertex tri[3] = { vertices[0], vertices[i], vertices[i + 1] };
+            SDL_RenderGeometry(renderer, NULL, tri, 3, NULL, 0);
         }
     }
 }
 
+
 char* Motion2Str(MotionType motion)
 {
     switch (motion) {
-    case MOTION_STATIC: return "static";
-    case MOTION_SPIN: return "spin";
-    case MOTION_DRIFT: return "drift";
-    case MOTION_PULSE: return "pulse";
-    case MOTION_BOUNCE: return "bounce";
-    case MOTION_WAVE: return "wave";
-    case MOTION_ZIGZAG: return "zigzag";
-    case MOTION_SWIRL: return "swirl";
-    case MOTION_NOISE: return "noise";
-    default: return "static";
+        case MOTION_STATIC: return "static";
+        case MOTION_SPIN: return "spin";
+        case MOTION_DRIFT: return "drift";
+        case MOTION_PULSE: return "pulse";
+        case MOTION_BOUNCE: return "bounce";
+        case MOTION_WAVE: return "wave";
+        case MOTION_ZIGZAG: return "zigzag";
+        case MOTION_SWIRL: return "swirl";
+        case MOTION_NOISE: return "noise";
+        default: return "static";
     }
 }
 
@@ -122,7 +182,7 @@ char* ShapeType2Str(ShapeType obj)
         case SHAPE_TRIANGLE: return "triangle";
         case SHAPE_NONE:
         default:
-            return "none";
+                             return "none";
     }
 }
 

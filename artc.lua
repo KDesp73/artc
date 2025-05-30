@@ -30,6 +30,16 @@ function square(opts) return 0 end
 -- @return entity id
 function triangle(opts) return 0 end
 
+--- Create a rectangle shape
+-- @param opts table: {x, y, w, h, color, motion, speed, radius}
+-- @return entity id
+function rectangle(opts) return 0 end
+
+--- Create an ellipse shape
+-- @param opts table: {x, y, w, h, color, motion, speed, radius}
+-- @return entity id
+function ellipse(opts) return 0 end
+
 --- Create a line entity
 -- @param opts table: {x1, y1, x2, y2, color, thickness}
 -- @return entity id

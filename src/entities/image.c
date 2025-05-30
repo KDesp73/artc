@@ -199,10 +199,9 @@ static void ApplyGreyscaleFilter(SDL_Surface* surface)
     SDL_UnlockSurface(surface);
 }
 
-
 void ImagePaint(ArtImage* i, View* view)
 {
-    if (!i || !view || !i->src) return;
+    if (!i || !view || !view->renderer || !i->src) return;
 
     SDL_Surface* image = IMG_Load(i->src);
     if (!image) {
@@ -210,6 +209,7 @@ void ImagePaint(ArtImage* i, View* view)
         return;
     }
 
+    // Apply filters on the surface as before
     if (i->filter) {
         if (strcmp(i->filter, "negative") == 0) {
             ApplyNegativeFilter(image);
@@ -230,6 +230,13 @@ void ImagePaint(ArtImage* i, View* view)
         }
     }
 
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(view->renderer, image);
+    if (!texture) {
+        SDL_Log("Failed to create texture: %s", SDL_GetError());
+        SDL_FreeSurface(image);
+        return;
+    }
+
     SDL_Rect dest = {
         (int)i->x,
         (int)i->y,
@@ -237,7 +244,8 @@ void ImagePaint(ArtImage* i, View* view)
         (int)i->h
     };
 
-    SDL_BlitScaled(image, NULL, view->surface, &dest);
+    SDL_RenderCopy(view->renderer, texture, NULL, &dest);
 
+    SDL_DestroyTexture(texture);
     SDL_FreeSurface(image);
 }

@@ -103,14 +103,12 @@ int main(int argc, char** argv)
 
         float t = frame * 0.05f;
 
+        // Clear screen with background color
         SDL_SetRenderDrawColor(view.renderer,
                 scene.options.background.r,
                 scene.options.background.g,
                 scene.options.background.b, 255);
-        SDL_FillRect(view.surface, NULL, SDL_MapRGBA(view.surface->format,
-                    scene.options.background.r,
-                    scene.options.background.g,
-                    scene.options.background.b, 255));
+        SDL_RenderClear(view.renderer);
 
         if (!is_art) {
             lua_getglobal(view.L, "update");
@@ -132,15 +130,18 @@ int main(int argc, char** argv)
             EntityPaint(e, &view);
         }
 
-        if (values.ascii)
-            ViewRenderAscii(&view);
-        else
-            ViewRender(&view);
+        if (values.ascii) {
+            ViewRenderAscii(&view);  // Might need adaptation
+        } else {
+            // Present the rendered frame
+            SDL_RenderPresent(view.renderer);
+        }
 
         if (values.export) {
             char ppm_file[64];
             snprintf(ppm_file, sizeof(ppm_file), ".artc/frame%04d.ppm", frame);
-            SaveFrameToPPM(ppm_file, view.width, view.height, view.surface);
+
+            SaveFrameToPPM(ppm_file, &view);
         }
 
         Uint32 frame_time = SDL_GetTicks() - frame_start;
