@@ -60,7 +60,7 @@ void ShapePaint(ArtShape* o, View* view)
     Uint8 r = o->color.r;
     Uint8 g = o->color.g;
     Uint8 b = o->color.b;
-    Uint8 a = 255;
+    Uint8 a = o->color.a;
 
     SDL_SetRenderDrawColor(renderer, r, g, b, a);
 
@@ -102,8 +102,6 @@ void ShapePaint(ArtShape* o, View* view)
         SDL_RenderGeometry(renderer, NULL, vertices, 3, NULL, 0);
 
     } else if (o->type == SHAPE_CIRCLE) {
-        // Approximate circle by polygon of many vertices
-
         const int num_segments = 40;
         SDL_Vertex vertices[num_segments];
         float cx = o->x;
@@ -122,30 +120,27 @@ void ShapePaint(ArtShape* o, View* view)
             vertices[i].tex_coord.y = 0;
         }
 
-        // Draw triangle fan
         for (int i = 1; i < num_segments - 1; i++) {
             SDL_Vertex tri[3] = { vertices[0], vertices[i], vertices[i+1] };
             SDL_RenderGeometry(renderer, NULL, tri, 3, NULL, 0);
         }
 
     } else if (o->type == SHAPE_ELLIPSE) {
-        // Approximate ellipse like circle but scale x and y separately
-
         const int num_segments = 40;
         SDL_Vertex vertices[num_segments];
         float cx = o->x;
         float cy = o->y;
-        float a = o->w / 2.0f;
-        float b = o->h / 2.0f;
+        float radius_x = o->w / 2.0f;
+        float radius_y = o->h / 2.0f;
 
         for (int i = 0; i < num_segments; i++) {
             float theta = (2.0f * M_PI * i) / num_segments;
-            vertices[i].position.x = cx + a * cosf(theta);
-            vertices[i].position.y = cy + b * sinf(theta);
+            vertices[i].position.x = cx + radius_x * cosf(theta);
+            vertices[i].position.y = cy + radius_y * sinf(theta);
             vertices[i].color.r = r;
             vertices[i].color.g = g;
             vertices[i].color.b = b;
-            vertices[i].color.a = a;
+            vertices[i].color.a = a;  // Use alpha here
             vertices[i].tex_coord.x = 0;
             vertices[i].tex_coord.y = 0;
         }

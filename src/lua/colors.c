@@ -230,10 +230,56 @@ static int lua_color_random(lua_State* L)
     return 1;
 }
 
+static int lua_rgba(lua_State* L)
+{
+    int r = 255, g = 255, b = 255, a = 255;
+    int nargs = lua_gettop(L);
+
+    if (nargs == 1 && lua_istable(L, 1)) {
+        lua_getfield(L, 1, "r");
+        r = (int)luaL_optinteger(L, -1, 255);
+        lua_pop(L, 1);
+
+        lua_getfield(L, 1, "g");
+        g = (int)luaL_optinteger(L, -1, 255);
+        lua_pop(L, 1);
+
+        lua_getfield(L, 1, "b");
+        b = (int)luaL_optinteger(L, -1, 255);
+        lua_pop(L, 1);
+
+        lua_getfield(L, 1, "a");
+        a = (int)luaL_optinteger(L, -1, 255);
+        lua_pop(L, 1);
+    }
+    else if (nargs >= 3 && nargs <= 4) {
+        r = (int)luaL_checknumber(L, 1);
+        g = (int)luaL_checknumber(L, 2);
+        b = (int)luaL_checknumber(L, 3);
+        if (nargs == 4) {
+            a = (int)luaL_checknumber(L, 4);
+        }
+    }
+    else {
+        return luaL_error(L, "rgba() expects a table or 3-4 numbers");
+    }
+
+    r = clamp(r);
+    g = clamp(g);
+    b = clamp(b);
+    a = clamp(a);
+
+    char hex[10];
+    snprintf(hex, sizeof(hex), "#%02X%02X%02X%02X", r, g, b, a);
+    lua_pushstring(L, hex);
+    return 1;
+}
+
 void register_color_module(lua_State* L)
 {
     static const struct luaL_Reg colorlib[] = {
         {"rgb", lua_rgb},
+        {"rgba", lua_rgba},
         {"to_rgb", lua_to_rgb},
         {"hsl", lua_hsl},
         {"to_hsl", lua_to_hsl},

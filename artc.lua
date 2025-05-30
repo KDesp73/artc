@@ -139,7 +139,16 @@ color = {}
 -- @param g number (optional): green component (0-255)
 -- @param b number (optional): blue component (0-255)
 -- @return string hex color string (e.g. "#FFAABB")
-function color.rgb(r, g, b) end
+function color.rgb(r, g, b) return "" end
+
+--- Create a hex color string from RGBA values
+-- Accepts either three numbers (r, g, b, a) or one table {r=..., g=..., b=..., a=...}
+-- @param r number|table: red component or table with r,g,b keys (0-255)
+-- @param g number (optional): green component (0-255)
+-- @param b number (optional): blue component (0-255)
+-- @param a number (optional): opacity (0-255)
+-- @return string hex color string (e.g. "#FFAABBAA")
+function color.rgba(r, g, b, a) return "" end
 
 --- Convert a hex color string (e.g. "#FFAABB") to an RGB table
 -- @param hex string
@@ -151,7 +160,7 @@ function color.to_rgb(hex) end
 -- @param s number: saturation in percent (0-100)
 -- @param l number: lightness in percent (0-100)
 -- @return string hex color string
-function color.hsl(h, s, l) end
+function color.hsl(h, s, l) return "" end
 
 --- Convert a hex color string to an HSL table
 -- @param hex string
@@ -160,4 +169,4 @@ function color.to_hsl(hex) end
 
 --- Returns a random color in hex format
 -- @return string
-function color.random() end
+function color.random() return "" end

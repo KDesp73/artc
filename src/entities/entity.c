@@ -31,7 +31,7 @@ SDL_Color ParseHexColor(const char* hex)
 {
     SDL_Color color = {255, 255, 255, 255};
 
-    if (!hex || hex[0] != '#' || strlen(hex) != 7) {
+    if (!hex || hex[0] != '#' || (strlen(hex) != 7 && strlen(hex) != 9)) {
         return color;
     }
 
@@ -42,6 +42,11 @@ SDL_Color ParseHexColor(const char* hex)
     color.r = (Uint8)strtol(r, NULL, 16);
     color.g = (Uint8)strtol(g, NULL, 16);
     color.b = (Uint8)strtol(b, NULL, 16);
+
+    if (strlen(hex) == 9) {
+        char a[3] = { hex[7], hex[8], '\0' };
+        color.a = (Uint8)strtol(a, NULL, 16);
+    }
 
     return color;
 }
