@@ -28,7 +28,6 @@ Scene SceneLoadLua(const char* filename, bool sandbox)
     char* buffer = load_file(filename);
     char tmp_path[256];
     bool preprocessor_run = ReplaceLinks(buffer, tmp_path);
-    INFO("run: %d", preprocessor_run);
 
     lua_State* L = luaL_newstate();
     if(sandbox){
