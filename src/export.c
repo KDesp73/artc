@@ -15,39 +15,67 @@ void Export(const char* format, const char* output, size_t fps)
 
 }
 
-void SaveFrameToPPM(const char* filename, View* view)
+/**
+ * Saves the current renderer contents as a PPM file
+ * 
+ * @param renderer The SDL_Renderer to capture
+ * @param filename The output PPM filename
+ * @return 0 on success, -1 on error
+ */
+static int saveRendererToPPM(SDL_Renderer* renderer, const char* filename)
 {
-    if (!filename || !view || !view->renderer) return;
+    if (!renderer || !filename) {
+        return -1;
+    }
 
     int width, height;
-    SDL_GetRendererOutputSize(view->renderer, &width, &height);
-
-    Uint8* pixels = malloc(width * height * 4);
-    if (!pixels) return;
-
-    if (SDL_RenderReadPixels(view->renderer, NULL, SDL_PIXELFORMAT_RGBA8888, pixels, width * 4) != 0) {
-        fprintf(stderr, "SDL_RenderReadPixels failed: %s\n", SDL_GetError());
-        free(pixels);
-        return;
+    SDL_GetRendererOutputSize(renderer, &width, &height);
+    
+    // Create a temporary surface to hold the pixel data
+    SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormat(
+        0, width, height, 32, SDL_PIXELFORMAT_RGBA32);
+    
+    if (!surface) {
+        fprintf(stderr, "Could not create surface: %s\n", SDL_GetError());
+        return -1;
     }
-
-    FILE* f = fopen(filename, "wb");
-    if (!f) {
-        free(pixels);
-        return;
+    
+    if (SDL_RenderReadPixels(renderer, NULL, surface->format->format,
+                            surface->pixels, surface->pitch) != 0) {
+        fprintf(stderr, "Could not read pixels: %s\n", SDL_GetError());
+        SDL_FreeSurface(surface);
+        return -1;
     }
-
-    fprintf(f, "P6\n%d %d\n255\n", width, height);
-
+    
+    FILE* file = fopen(filename, "wb");
+    if (!file) {
+        fprintf(stderr, "Could not open file for writing: %s\n", filename);
+        SDL_FreeSurface(surface);
+        return -1;
+    }
+    
+    fprintf(file, "P6\n%d %d\n255\n", width, height);
+    
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            Uint8* p = pixels + y * width * 4 + x * 4;
-            fwrite(&p[0], 1, 1, f); // R
-            fwrite(&p[1], 1, 1, f); // G
-            fwrite(&p[2], 1, 1, f); // B
+            Uint32 pixel = ((Uint32*)surface->pixels)[y * width + x];
+            Uint8 r = (pixel >> surface->format->Rshift) & 0xFF;
+            Uint8 g = (pixel >> surface->format->Gshift) & 0xFF;
+            Uint8 b = (pixel >> surface->format->Bshift) & 0xFF;
+            
+            fwrite(&r, 1, 1, file);
+            fwrite(&g, 1, 1, file);
+            fwrite(&b, 1, 1, file);
         }
     }
+    
+    fclose(file);
+    SDL_FreeSurface(surface);
+    
+    return 0;
+}
 
-    fclose(f);
-    free(pixels);
+void SaveFrameToPPM(const char* filename, View* view)
+{
+    saveRendererToPPM(view->renderer, filename);
 }
