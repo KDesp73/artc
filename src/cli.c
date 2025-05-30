@@ -1,9 +1,20 @@
 #include "cli.h"
-#include "help.h"
+#include "files.h"
 #include "io/cli.h"
 #include "io/logging.h"
-#include "scene.h"
 #include "version.h"
+
+const char* template = ""
+"window(800, 800)\n"
+"palette(\"catppuccin\")\n"
+"bg(palette.black)\n"
+"fps(30)\n"
+"\n"
+"function setup()\n"
+"end\n"
+"\n"
+"function update(dt)\n"
+"end\n";
 
 
 void CliValuesInit(CliValues* v)
@@ -42,6 +53,7 @@ void CliParse(CliValues* v, int argc, char** argv)
         cli_arg_new('A', "ascii", "Render visuals in the terminal", no_argument),
         cli_arg_new('S', "no-sandbox", "Do not sandbox lua (Be careful)", no_argument),
         cli_arg_new('d', "duration", "Exit after the provided amount of seconds", required_argument),
+        cli_arg_new('t', "template", "Generate a template lua file", no_argument),
         NULL
     );
 
@@ -79,6 +91,10 @@ void CliParse(CliValues* v, int argc, char** argv)
                 // TODO: validate input
                 v->durations_s = (size_t) atoi(optarg);
                 break;
+            case 't':
+                file_write("template.lua", template);
+                INFO("Created 'template.lua'");
+                exit(0);
             default:
                 exit(1);
         }

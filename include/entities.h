@@ -4,6 +4,7 @@
 #include "view.h"
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_ttf.h"
+#include <stdbool.h>
 
 typedef enum {
     MOTION_STATIC,
@@ -65,6 +66,7 @@ typedef struct {
     SDL_Color fg, bg;
     char* font;
     char* content;
+    bool blend;
 } ArtText;
 
 typedef struct {

@@ -34,7 +34,9 @@ void TextPaint(ArtText* t, View* view)
         return;
     }
 
-    SDL_Surface* text_surface = TTF_RenderText_Shaded(font, t->content, t->fg, t->bg);
+    SDL_Surface* text_surface = (!t->blend) 
+        ? TTF_RenderText_Shaded(font, t->content, t->fg, t->bg)
+        : TTF_RenderText_Blended(font, t->content, t->fg);
     if (!text_surface) {
         fprintf(stderr, "Failed to render text: %s\n", TTF_GetError());
         TTF_CloseFont(font);

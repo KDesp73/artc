@@ -195,6 +195,10 @@ int lua_modify_entity(lua_State* L)
             text->content = strdup(content_str);
         }
         lua_pop(L, 1);
+
+        lua_getfield(L, 2, "blend");
+        text->blend = lua_toboolean(L, -1);
+        lua_pop(L, 1);
     } else {
         return luaL_error(L, "Unknown entity type");
     }

@@ -52,14 +52,14 @@ static int is_valid_image(const char* path) {
     return valid;
 }
 
-void ReplaceLinks(const char* buffer, char* out_path)
+bool ReplaceLinks(const char* buffer, char* out_path)
 {
     regex_t regex;
     regmatch_t match[2];
 
     // Basic URL matcher
     const char* pattern = "(https?://[^\"]+)";
-    if (regcomp(&regex, pattern, REG_EXTENDED)) return;
+    if (regcomp(&regex, pattern, REG_EXTENDED)) return false;
 
     char* new_script = malloc(strlen(buffer) * 2); // generous allocation
     new_script[0] = '\0';
@@ -103,9 +103,10 @@ void ReplaceLinks(const char* buffer, char* out_path)
     // Write to temp file
     strcpy(out_path, ".artc/tmp.lua");
     FILE* f = fopen(out_path, "w");
-    if (!f) return;
+    if (!f) return false;
     fputs(new_script, f);
     fclose(f);
 
     free(new_script);
+    return true;
 }

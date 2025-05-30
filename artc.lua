@@ -13,27 +13,27 @@ function window(width, height) end
 --- Create a shape
 -- @param opts table: {x, y, size, type, color, motion, speed, radius}
 -- @return entity id
-function shape(opts) end
+function shape(opts) return 0 end
 
 --- Create a circle shape
 -- @param opts table: {x, y, size, color, motion, speed, radius}
 -- @return entity id
-function circle(opts) end
+function circle(opts) return 0 end
 
 --- Create a square shape
 -- @param opts table: {x, y, size, color, motion, speed, radius}
 -- @return entity id
-function square(opts) end
+function square(opts) return 0 end
 
 --- Create a triangle shape
 -- @param opts table: {x, y, size, color, motion, speed, radius}
 -- @return entity id
-function triangle(opts) end
+function triangle(opts) return 0 end
 
 --- Create a line entity
 -- @param opts table: {x1, y1, x2, y2, color, thickness}
 -- @return entity id
-function line(opts) end
+function line(opts) return 0 end
 
 --- @class filter
 filter = {
@@ -60,7 +60,7 @@ font = {
 }
 
 --- Create a text entity
--- @param opts table: {x, y, font, size, fg, bg, content}
+-- @param opts table: {x, y, font, size, fg, bg, content, blend}
 -- @return entity id
 function text(opts) end
 

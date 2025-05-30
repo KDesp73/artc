@@ -18,7 +18,7 @@
 
 
 static volatile int keep_running = 1;
-void handle_sigint(int sig) {
+void handle_exit(int sig) {
     (void)sig;
 
     ANSI_SHOW_CURSOR();
@@ -31,11 +31,13 @@ Scene scene = {0};
 CliValues values = {0};
 int main(int argc, char** argv)
 {
-    signal(SIGINT, handle_sigint);
+    signal(SIGINT , handle_exit);
+    signal(SIGKILL, handle_exit);
+    signal(SIGTERM, handle_exit);
+    signal(SIGQUIT, handle_exit);
 
     CliValuesInit(&values);
     CliParse(&values, argc, argv);
-    
 
     if(dir_exists(".artc")) {
         dir_remove(".artc");
@@ -56,6 +58,11 @@ int main(int argc, char** argv)
         ERRO("The file must have an .art or a .lua extension");
         return 1;
     }
+    if(!file_exists(file)) {
+        ERRO("File %s does not exist", file);
+        return 1;
+    }
+
     bool is_art = strstr(file, ".art");
     values.output = (values.output) ? values.output : swap_ext(file, values.format);
 
@@ -71,12 +78,11 @@ int main(int argc, char** argv)
 
     view.width = scene.options.width;
     view.height = scene.options.height;
-    if (!ViewInit(&view)) return 1;
-
-    if(values.ascii){ 
-        values.export = false;
-        // view.fps = 120;
+    if (!ViewInit(&view)) {
+        PANIC("Unexpected error");
     }
+
+    if(values.ascii) values.export = false;
 
     bool running = true;
     SDL_Event event;
