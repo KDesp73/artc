@@ -65,7 +65,9 @@ bool ReplaceLinks(const char* buffer, char* out_path)
     new_script[0] = '\0';
 
     const char* cursor = buffer;
+    bool matched = false;
     while (regexec(&regex, cursor, 1, match, 0) == 0) {
+        matched = true;
         strncat(new_script, cursor, match[0].rm_so);
 
         char url[MAX_URL_LEN];
@@ -108,5 +110,5 @@ bool ReplaceLinks(const char* buffer, char* out_path)
     fclose(f);
 
     free(new_script);
-    return true;
+    return matched;
 }
