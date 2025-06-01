@@ -13,3 +13,4 @@ libartc.so
 *.mp4
 test.lua
 *.gif
+.env
