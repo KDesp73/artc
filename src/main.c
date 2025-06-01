@@ -157,13 +157,13 @@ int main(int argc, char** argv)
         }
 
         // Only present if not in headless export mode
-        // if (!values.export || !values.headless) {
+        if (!values.export /*|| !values.headless*/) {
             if (values.ascii) {
                 ViewRenderAscii(&view);
             } else {
                 SDL_RenderPresent(view.renderer);
             }
-        // }
+        }
 
         // Frame rate limiting
         Uint32 frame_time = SDL_GetTicks() - frame_start;
