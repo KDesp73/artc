@@ -1,5 +1,6 @@
 window(800, 800)
 bg("#000014")
+fps(30)
 
 local centerX, centerY = 400, 400
 local points = {}

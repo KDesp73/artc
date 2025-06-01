@@ -1,18 +1,58 @@
 #include "export.h"
+#include "io/logging.h"
 #include <SDL2/SDL_render.h>
+#include <stdlib.h>
 
 void Export(const char* format, const char* output, size_t fps)
 {
-    char command[256];
-    if(strcmp(format, "mp4") == 0) {
-        snprintf(command, 256, "ffmpeg -v quiet -framerate %zu -i .artc/frame%%04d.ppm -pix_fmt yuv420p %s", fps, output);
-        system(command);
+    char command[1024];
+    int ret;
+    
+    if (strcmp(format, "mp4") == 0) {
+        ret = snprintf(command, sizeof(command),
+                "ffmpeg -v quiet -framerate %zu -i .artc/frame%%04d.ppm "
+                "-r %zu -pix_fmt yuv420p -vsync cfr %s -y",
+                fps, fps, output);
     } else if(strcmp(format, "gif") == 0) {
-        system("ffmpeg -v quiet -framerate 30 -i .artc/frame%04d.ppm -filter_complex \"[0:v] palettegen\" .artc/palette.png");
-        snprintf(command, 256, "ffmpeg -v quiet -framerate %zu -i .artc/frame%%04d.ppm -i .artc/palette.png -filter_complex \"[0:v][1:v] paletteuse\" %s", fps, output);
-        system(command);
+        char palette_command[1024];
+        
+        // Generate palette
+        ret = snprintf(palette_command, sizeof(palette_command), 
+            "ffmpeg -v quiet -framerate %zu -i .artc/frame%%04d.ppm -filter_complex \"[0:v] palettegen\" .artc/palette.png", 
+            fps);
+            
+        if (ret < 0 || (size_t)ret >= sizeof(palette_command)) {
+            fprintf(stderr, "Error: Palette command too long for buffer\n");
+            return;
+        }
+        
+        if (system(palette_command) != 0) {
+            fprintf(stderr, "Error: Failed to generate palette\n");
+            return;
+        }
+        
+        // Create GIF - use the same frame rate for input and output
+        ret = snprintf(command, sizeof(command),
+            "ffmpeg -v quiet -framerate %zu -i .artc/frame%%04d.ppm -i .artc/palette.png "
+            "-filter_complex \"[0:v][1:v] paletteuse=dither=none\" %s -y",
+            fps, output);
+            
+        if (ret < 0 || (size_t)ret >= sizeof(command)) {
+            fprintf(stderr, "Error: GIF command too long for buffer\n");
+            remove(".artc/palette.png");
+            return;
+        }
+    } else {
+        fprintf(stderr, "Error: Unknown format '%s'\n", format);
+        return;
     }
-
+    
+    if (system(command) != 0) {
+        fprintf(stderr, "Error: Failed to create %s\n", format);
+    }
+    
+    // Clean up palette file if it exists
+    remove(".artc/palette.png");
 }
 
 /**

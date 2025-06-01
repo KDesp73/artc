@@ -16,7 +16,9 @@ BLUESKY_HANDLE = os.getenv("BLUESKY_HANDLE")
 BLUESKY_PASSWORD = os.getenv("BLUESKY_PASSWORD")
 
 def generate_description(lua_script):
-    return client_utils.TextBuilder().text(f"{lua_script}\n\nMade with ").tag("#artc", "artc")
+    desc = client_utils.TextBuilder().text(f"{lua_script}\n\nMade with ").tag("#artc", "artc")
+    print(desc)
+    return desc
 
 def get_video_dimensions(filepath):
     result = subprocess.run([

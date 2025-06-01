@@ -1,6 +1,6 @@
 window(800, 800)
 bg("#000014")
-seed(42)
+seed(30)
 
 local particles = {}
 local count = 200

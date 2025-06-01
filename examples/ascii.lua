@@ -1,8 +1,8 @@
-local scale = 1.5
+local scale = 2
 window(520 * scale, 520 * scale)
 palette("catppuccin")
 bg(palette.black)
-fps(15)
+fps(30)
 
 local glyphs = { " ", ".", ":", "-", "=", "+", "*", "#", "%", "@" }
 
@@ -39,7 +39,7 @@ function setup()
 end
 
 function update(dt)
-    local t = time() * 0.0025
+    local t = time() / 1000
 
     for _, cell in ipairs(grid) do
         -- New waving pattern: combine sine and cosine for a ripple effect
