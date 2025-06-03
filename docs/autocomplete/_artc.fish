@@ -14,23 +14,23 @@ function _artc
         set COMP_CWORD (count $COMP_WORDS)
     end
 
-    set literals "--help" "gif" "-d" "--ascii" "--format" "mp4" "-o" "-v" "-F" "--version" "--export" "--output" "--no-sandbox" "--duration" "-h" "-x" "gif" "-A" "-S" "mp4"
+    set literals "--help" "gif" "png" "--ascii" "--format" "mp4" "-o" "-d" "-v" "-F" "--version" "png" "--export" "--output" "--no-sandbox" "-h" "-x" "gif" "-A" "-S" "--duration" "mp4"
 
     set descriptions
-    set descriptions[3] "Exit after the specified amount of seconds"
     set descriptions[7] "Specify a different output path"
-    set descriptions[8] "Prints the current version and exits"
-    set descriptions[9] "Specify the format of the exported file"
-    set descriptions[15] "Prints the help message"
-    set descriptions[16] "Export the render in a media file"
-    set descriptions[18] "Render visuals in the terminal"
-    set descriptions[19] "Do not sandbox lua (Be careful)"
+    set descriptions[8] "Exit after the specified amount of seconds"
+    set descriptions[9] "Prints the current version and exits"
+    set descriptions[10] "Specify the format of the exported file"
+    set descriptions[16] "Prints the help message"
+    set descriptions[17] "Export the render in a media file"
+    set descriptions[19] "Render visuals in the terminal"
+    set descriptions[20] "Do not sandbox lua (Be careful)"
 
     set literal_transitions
-    set literal_transitions[2] "set inputs 1 3 4 5 7 8 9 10 12 14 13 11 15 16 18 19; set tos 4 4 4 5 3 4 6 4 3 4 4 4 4 4 4 4"
-    set literal_transitions[4] "set inputs 1 3 4 5 7 8 9 10 12 14 13 11 15 16 18 19; set tos 4 4 4 5 3 4 6 4 3 4 4 4 4 4 4 4"
-    set literal_transitions[5] "set inputs 17 20; set tos 4 4"
-    set literal_transitions[6] "set inputs 17 20; set tos 4 4"
+    set literal_transitions[2] "set inputs 1 8 4 5 7 21 10 11 14 9 15 13 16 17 19 20; set tos 4 4 4 5 3 4 6 4 3 4 4 4 4 4 4 4"
+    set literal_transitions[4] "set inputs 1 8 4 5 7 21 10 11 14 9 15 13 16 17 19 20; set tos 4 4 4 5 3 4 6 4 3 4 4 4 4 4 4 4"
+    set literal_transitions[5] "set inputs 12 18 22; set tos 4 4 4"
+    set literal_transitions[6] "set inputs 18 22 12; set tos 4 4 4"
 
     set match_anything_transitions_from 3 1
     set match_anything_transitions_to 4 2

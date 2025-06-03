@@ -11,6 +11,6 @@ artc <PATH> <OPTIONS>...;
             | (-d || --duration) "Exit after the specified amount of seconds"
 			;
 
-<FMT> ::= (mp4 | gif);
+<FMT> ::= (mp4 | gif | png);
 
 

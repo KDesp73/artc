@@ -5,23 +5,23 @@ _artc_cmd_0 () {
 }
 
 _artc () {
-    local -a literals=("--help" "gif" "-d" "--ascii" "--format" "mp4" "-o" "-v" "-F" "--version" "--export" "--output" "--no-sandbox" "--duration" "-h" "-x" "gif" "-A" "-S" "mp4")
+    local -a literals=("--help" "gif" "png" "--ascii" "--format" "mp4" "-o" "-d" "-v" "-F" "--version" "png" "--export" "--output" "--no-sandbox" "-h" "-x" "gif" "-A" "-S" "--duration" "mp4")
 
     local -A descriptions
-    descriptions[3]="Exit after the specified amount of seconds"
     descriptions[7]="Specify a different output path"
-    descriptions[8]="Prints the current version and exits"
-    descriptions[9]="Specify the format of the exported file"
-    descriptions[15]="Prints the help message"
-    descriptions[16]="Export the render in a media file"
-    descriptions[18]="Render visuals in the terminal"
-    descriptions[19]="Do not sandbox lua (Be careful)"
+    descriptions[8]="Exit after the specified amount of seconds"
+    descriptions[9]="Prints the current version and exits"
+    descriptions[10]="Specify the format of the exported file"
+    descriptions[16]="Prints the help message"
+    descriptions[17]="Export the render in a media file"
+    descriptions[19]="Render visuals in the terminal"
+    descriptions[20]="Do not sandbox lua (Be careful)"
 
     local -A literal_transitions
-    literal_transitions[2]="([1]=4 [3]=4 [4]=4 [5]=5 [7]=3 [8]=4 [9]=6 [10]=4 [12]=3 [14]=4 [13]=4 [11]=4 [15]=4 [16]=4 [18]=4 [19]=4)"
-    literal_transitions[4]="([1]=4 [3]=4 [4]=4 [5]=5 [7]=3 [8]=4 [9]=6 [10]=4 [12]=3 [14]=4 [13]=4 [11]=4 [15]=4 [16]=4 [18]=4 [19]=4)"
-    literal_transitions[5]="([17]=4 [20]=4)"
-    literal_transitions[6]="([17]=4 [20]=4)"
+    literal_transitions[2]="([1]=4 [8]=4 [4]=4 [5]=5 [7]=3 [21]=4 [10]=6 [11]=4 [14]=3 [9]=4 [15]=4 [13]=4 [16]=4 [17]=4 [19]=4 [20]=4)"
+    literal_transitions[4]="([1]=4 [8]=4 [4]=4 [5]=5 [7]=3 [21]=4 [10]=6 [11]=4 [14]=3 [9]=4 [15]=4 [13]=4 [16]=4 [17]=4 [19]=4 [20]=4)"
+    literal_transitions[5]="([12]=4 [18]=4 [22]=4)"
+    literal_transitions[6]="([18]=4 [22]=4 [12]=4)"
 
     local -A match_anything_transitions
     match_anything_transitions=([3]=4 [1]=2)
@@ -60,8 +60,8 @@ _artc () {
 
         return 1
     done
-    declare -A literal_transitions_level_0=([2]="3 7 8 9 15 16 18 19" [6]="17 20" [4]="3 7 8 9 15 16 18 19")
-    declare -A literal_transitions_level_1=([2]="1 4 5 10 12 14 13 11" [5]="17 20" [4]="1 4 5 10 12 14 13 11")
+    declare -A literal_transitions_level_0=([2]="8 7 10 9 16 17 19 20" [6]="18 22 12" [4]="8 7 10 9 16 17 19 20")
+    declare -A literal_transitions_level_1=([2]="1 4 5 21 11 14 15 13" [5]="12 18 22" [4]="1 4 5 21 11 14 15 13")
     declare -A subword_transitions_level_0=()
     declare -A subword_transitions_level_1=()
     declare -A commands_level_0=()
