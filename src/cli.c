@@ -30,7 +30,7 @@ void CliValuesInit(CliValues* v)
 static bool validate_format(char* fmt)
 {
     char* allowed[] = {
-        "gif", "mp4",
+        "gif", "mp4", "png"
     };
     for(size_t i = 0; i < sizeof(allowed)/sizeof(allowed[0]); i++){
         if(!strcmp(fmt, allowed[i])) return true;

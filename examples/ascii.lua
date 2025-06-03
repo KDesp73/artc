@@ -1,18 +1,14 @@
-local scale = 2
+local scale = 1.5
 window(520 * scale, 520 * scale)
 palette("catppuccin")
 bg(palette.black)
-fps(30)
+fps(15)
 
 local glyphs = { " ", ".", ":", "-", "=", "+", "*", "#", "%", "@" }
 
 local grid = {}
 local cols, rows = 20, 20
 local cell_size = 24 * scale
-
--- Calculate grid size for centering
-local grid_width = cols * cell_size
-local grid_height = rows * cell_size
 
 function setup()
     local f = font.cozette
@@ -39,7 +35,7 @@ function setup()
 end
 
 function update(dt)
-    local t = time() / 1000
+    local t = time() * 0.0025
 
     for _, cell in ipairs(grid) do
         -- New waving pattern: combine sine and cosine for a ripple effect

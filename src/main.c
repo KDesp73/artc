@@ -1,6 +1,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include "cli.h"
 #include "entities.h"
@@ -88,6 +89,7 @@ int main(int argc, char** argv)
     }
 
     if (values.ascii) values.export = false;
+    if (!strcmp(values.format, "png")) values.durations_s = 1;
 
     // Main loop variables
     bool running = true;

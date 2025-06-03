@@ -42,11 +42,20 @@ void Export(const char* format, const char* output, size_t fps)
             remove(".artc/palette.png");
             return;
         }
+    } else if(strcmp(format, "png") == 0) {
+        ret = snprintf(command, sizeof(command),
+                "ffmpeg -v quiet -i .artc/frame0001.ppm %s -y",
+                output);
+
+        if (ret < 0 || (size_t)ret >= sizeof(command)) {
+            fprintf(stderr, "Error: PNG command too long for buffer\n");
+            return;
+        }
     } else {
         fprintf(stderr, "Error: Unknown format '%s'\n", format);
         return;
     }
-    
+
     if (system(command) != 0) {
         fprintf(stderr, "Error: Failed to create %s\n", format);
     }
