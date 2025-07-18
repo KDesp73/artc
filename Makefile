@@ -1,7 +1,7 @@
 # Compiler and flags
-CC = gcc
+CC = gcc 
 INCLUDE = -Iinclude -Ideps/include
-CFLAGS = -Wall -fPIC $(INCLUDE)
+CFLAGS =  -Wall -fPIC $(INCLUDE)
 LDFLAGS = -Ldeps/lib -lSDL2 -lSDL2_ttf -lSDL2_image -lm -l:liblua.a -lmagic
 
 # Directories
@@ -110,9 +110,9 @@ compile_commands.json: $(SRC_FILES) ## Generate compile_commands.json
 
 .PHONY: autocomplete
 autocomplete: ## Generate autocomplete scripts for bash, zsh and fish shells
-	complgen aot ./docs/autocomplete/artc.usage --zsh-script ./docs/autocomplete/_artc.zsh
-	complgen aot ./docs/autocomplete/artc.usage --bash-script ./docs/autocomplete/_artc.bash
-	complgen aot ./docs/autocomplete/artc.usage --fish-script ./docs/autocomplete/_artc.fish
+	complgen  --zsh ./docs/autocomplete/_artc.zsh  ./docs/autocomplete/artc.usage
+	complgen --bash ./docs/autocomplete/_artc.bash ./docs/autocomplete/artc.usage
+	complgen --fish ./docs/autocomplete/_artc.fish ./docs/autocomplete/artc.usage
 
 .PHONY: help
 help: ## Show this help message
