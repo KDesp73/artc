@@ -50,6 +50,14 @@ int lua_modify_entity(lua_State* L)
         if (lua_isnumber(L, -1)) obj->size = (float)lua_tonumber(L, -1);
         lua_pop(L, 1);
 
+        lua_getfield(L, 2, "w");
+        if (lua_isnumber(L, -1)) obj->w = (float)lua_tonumber(L, -1);
+        lua_pop(L, 1);
+
+        lua_getfield(L, 2, "h");
+        if (lua_isnumber(L, -1)) obj->h = (float)lua_tonumber(L, -1);
+        lua_pop(L, 1);
+
         lua_getfield(L, 2, "speed");
         if (lua_isnumber(L, -1)) obj->speed = (float)lua_tonumber(L, -1);
         lua_pop(L, 1);
