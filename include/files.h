@@ -3,7 +3,14 @@
 
 #include <dirent.h>
 #include <errno.h>
+#include <limits.h>
+#ifndef PATH_MAX
+#if defined(__linux__)
 #include <linux/limits.h>
+#else
+#include <sys/syslimits.h>
+#endif
+#endif
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>

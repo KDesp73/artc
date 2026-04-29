@@ -1,18 +1,66 @@
 # Compiler and flags
-CC = gcc 
+UNAME_S := $(shell uname -s)
+CC = gcc
+AR ?= ar
+LIBRARY_NAME = artc
+A_NAME = lib$(LIBRARY_NAME).a
 INCLUDE = -Iinclude -Ideps/include
 CFLAGS =  -Wall -fPIC $(INCLUDE)
+ifeq ($(UNAME_S),Darwin)
+# Homebrew: brew install sdl2 sdl2_ttf sdl2_image lua libmagic
+BREW := $(shell command -v brew 2>/dev/null)
+BREW_PREFIX := $(if $(BREW),$(shell $(BREW) --prefix 2>/dev/null),/opt/homebrew)
+ifeq ($(shell test -d '$(BREW_PREFIX)' && echo 1),)
+BREW_PREFIX := /usr/local
+endif
+PKGCF := $(BREW_PREFIX)/lib/pkgconfig
+HAVE_SDL_PCS := $(shell export PKG_CONFIG_PATH="$$PKG_CONFIG_PATH:$(PKGCF)"; \
+	pkg-config --exists sdl2 SDL2_ttf SDL2_image 2>/dev/null && echo 1)
+ifeq ($(HAVE_SDL_PCS),1)
+SDL_DARWIN_CFLAGS := $(shell export PKG_CONFIG_PATH="$$PKG_CONFIG_PATH:$(PKGCF)"; \
+	pkg-config --cflags sdl2 SDL2_ttf SDL2_image 2>/dev/null)
+SDL_DARWIN_LIBS := $(shell export PKG_CONFIG_PATH="$$PKG_CONFIG_PATH:$(PKGCF)"; \
+	pkg-config --libs sdl2 SDL2_ttf SDL2_image 2>/dev/null)
+else
+SDL_DARWIN_CFLAGS := -I$(BREW_PREFIX)/include/SDL2 -I$(BREW_PREFIX)/include
+SDL_DARWIN_LIBS := -L$(BREW_PREFIX)/lib -lSDL2 -lSDL2_ttf -lSDL2_image
+endif
+CFLAGS += $(SDL_DARWIN_CFLAGS)
+# brew --prefix lua can point to an uninstalled prefix; only use it if the library exists
+# (deps/lib/liblua.a is a GNU ar build for Linux and cannot be linked on macOS; use 'brew install lua')
+LUA_PFX_CAND := $(if $(BREW),$(shell $(BREW) --prefix lua 2>/dev/null),)
+LUA_PFX := $(if $(LUA_PFX_CAND),$(shell t='$(LUA_PFX_CAND)'; if test -d "$$t/lib" && ( test -e "$$t/lib/liblua.a" || test -e "$$t/lib/liblua.dylib" ); then echo "$$t"; fi),)
+ifeq ($(LUA_PFX),)
+$(error On macOS, install Lua with Homebrew: 'brew install lua' (vendored deps/lib/liblua.a is for Linux only))
+endif
+LUA_DARWIN_LIBS := -L$(LUA_PFX)/lib -llua
+ifeq ($(BREW),)
+MAGIC_LIBDIR := $(BREW_PREFIX)/lib
+else
+MAGIC_LIBDIR := $(shell if test -d "$(BREW_PREFIX)/opt/libmagic/lib"; then \
+	printf '%s' "$(BREW_PREFIX)/opt/libmagic/lib"; \
+	else printf '%s' "$(BREW_PREFIX)/lib"; fi)
+endif
+LDFLAGS = $(SDL_DARWIN_LIBS) $(LUA_DARWIN_LIBS) -lm -L$(MAGIC_LIBDIR) -lmagic
+EXE_LDLIBS = -L. -l$(LIBRARY_NAME)
+SO_NAME = lib$(LIBRARY_NAME).dylib
+SHLIB_FLAG = -dynamiclib
+# Objects expect globals (scene, view) and single-translation-unit CLI; treat like a loadable module
+SHLIB_DARWIN_EXTRA = -undefined dynamic_lookup
+else
+# Linux: vendored .so in deps; -l: needs GNU ld
 LDFLAGS = -Ldeps/lib -lSDL2 -lSDL2_ttf -lSDL2_image -lm -l:liblua.a -lmagic
+EXE_LDLIBS = -L. -l:$(A_NAME)
+SO_NAME = lib$(LIBRARY_NAME).so
+SHLIB_FLAG = -shared
+SHLIB_DARWIN_EXTRA =
+endif
 
 # Directories
 SRC_DIR = src
 INCLUDE_DIR = include
 BUILD_DIR = build
 DIST_DIR = dist
-
-LIBRARY_NAME = artc
-SO_NAME = lib$(LIBRARY_NAME).so
-A_NAME = lib$(LIBRARY_NAME).a
 
 # Target and version info
 TARGET = $(LIBRARY_NAME)
@@ -69,12 +117,12 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c ## Compile source files with progress
 
 $(TARGET): $(BUILD_DIR) static ## Build executable using static library
 	@echo "[INFO] Building executable: $(TARGET)"
-	@$(CC) src/main.c -o $(TARGET) -L. -l:$(A_NAME) $(LDFLAGS) $(INCLUDE)
+	@$(CC) src/main.c -o $(TARGET) $(EXE_LDLIBS) $(LDFLAGS) $(INCLUDE)
 
 .PHONY: shared
 shared: $(BUILD_DIR) $(OBJ_FILES) ## Build shared library
 	@echo "[INFO] Building shared library: $(SO_NAME)"
-	@$(CC) -shared $(CFLAGS) -o $(SO_NAME) $(OBJ_FILES)
+	@$(CC) $(SHLIB_FLAG) $(CFLAGS) -o $(SO_NAME) $(OBJ_FILES) $(LDFLAGS) $(SHLIB_DARWIN_EXTRA)
 
 .PHONY: static
 static: $(BUILD_DIR) $(OBJ_FILES) ## Build static library
