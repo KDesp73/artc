@@ -7,10 +7,16 @@
 
 extern Scene scene;
 
-static ArtEntity* find_entity_by_id(int id) {
+static ArtEntity* find_entity_by_id(int id)
+{
+    /* Id matches packed index for entities created in order (common; see lua_clear_scene next_id). */
+    if (id >= 0 && id < scene.count && scene.entities[id].id == id) {
+        return &scene.entities[id];
+    }
     for (int i = 0; i < scene.count; i++) {
-        if (scene.entities[i].id == id)
+        if (scene.entities[i].id == id) {
             return &scene.entities[i];
+        }
     }
     return NULL;
 }
@@ -209,6 +215,8 @@ int lua_modify_entity(lua_State* L)
 int lua_clear_scene(lua_State* L)
 {
     scene.count = 0;
+    scene.next_id = 0;
+    (void)L;
     return 0;
 }
 
