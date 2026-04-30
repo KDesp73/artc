@@ -1,20 +1,20 @@
--- Chess board: standard start position, white knight on g1 touring a closed path, soft square pulse.
-window(800, 800)
-bg("#1e1812")
-fps(30)
+-- Knight tour + kings + bishop; paths stay on disjoint squares.
+local W, H = 800, 800
+window(W, H)
+bg("#121218")
+fps(45)
 seed(7)
 
-local CELL = 72
+local CELL = math.floor(math.min(W, H) / 8)
 local PIECE_SCALE = 0.88
-local BOARD = 8 * CELL
-local ORIG_X = (800 - BOARD) / 2
-local ORIG_Y = (800 - BOARD) / 2 + 20
+local BOARD = CELL * 8
+local ORIG_X = (W - BOARD) / 2
+local ORIG_Y = (H - BOARD) / 2
 
--- Classic light/dark board (similar to common wood themes)
-local BASE_LIGHT = { r = 240, g = 217, b = 181 }
-local BASE_DARK = { r = 181, g = 133, b = 99 }
+local BASE_LIGHT = { r = 232, g = 228, b = 218 }
+local BASE_DARK = { r = 58, g = 82, b = 74 }
 
--- Closed knight path: g1 → e2 → c1 → a2 → b4 → d3 → f4 → h3 → g1 (files 0–7, ranks 1–8)
+-- Knight closed tour (vertices — no other pieces use these squares)
 local KNIGHT_PATH = {
     { 6, 1 },
     { 4, 2 },
@@ -26,8 +26,48 @@ local KNIGHT_PATH = {
     { 7, 3 },
 }
 
+-- White king: small orbit on e1–d1–f1 (never visits knight squares)
+local WK_PATH = {
+    { 4, 1 },
+    { 3, 1 },
+    { 4, 1 },
+    { 5, 1 },
+    { 4, 1 },
+}
+
+-- Black king: trace e8–h8 and back (knight never enters rank 8 on this tour)
+local BK_PATH = {
+    { 4, 8 },
+    { 5, 8 },
+    { 6, 8 },
+    { 7, 8 },
+    { 6, 8 },
+    { 5, 8 },
+    { 4, 8 },
+}
+
+-- Black bishop: one diagonal step per edge; large loop mid-board (no knight / king squares)
+local BB_PATH = {
+    { 2, 5 },
+    { 3, 6 },
+    { 4, 7 },
+    { 5, 6 },
+    { 6, 5 },
+    { 7, 4 },
+    { 6, 3 },
+    { 5, 2 },
+    { 4, 3 },
+    { 3, 4 },
+}
+
 local squares = {}
-local knight_id
+--- movers: id, path, seg_dur, arc (knight jump), phase (time offset)
+local movers = {}
+
+local function smootherstep(t)
+    local x = math.max(0, math.min(1, t))
+    return x * x * x * (x * (x * 6 - 15) + 10)
+end
 
 function square_top_left(file, rank)
     return ORIG_X + file * CELL, ORIG_Y + (8 - rank) * CELL
@@ -38,19 +78,6 @@ function piece_top_left(file, rank, sz)
 end
 
 function setup()
-    -- Frame
-    local frame = 4
-    local fx = ORIG_X - frame
-    local fy = ORIG_Y - frame
-    local fw = BOARD + frame * 2
-    local fh = BOARD + frame * 2
-    rectangle({ x = fx, y = fy, w = fw, h = fh, color = "#4a3728", motion = "none" })
-    line({ x1 = fx, y1 = fy, x2 = fx + fw, y2 = fy, color = "#6b5344", thickness = 2 })
-    line({ x1 = fx, y1 = fy + fh, x2 = fx + fw, y2 = fy + fh, color = "#6b5344", thickness = 2 })
-    line({ x1 = fx, y1 = fy, x2 = fx, y2 = fy + fh, color = "#6b5344", thickness = 2 })
-    line({ x1 = fx + fw, y1 = fy, x2 = fx + fw, y2 = fy + fh, color = "#6b5344", thickness = 2 })
-
-    -- Squares
     for rank = 1, 8 do
         for file = 0, 7 do
             local is_dark = (file + rank) % 2 == 1
@@ -71,131 +98,101 @@ function setup()
         end
     end
 
-    -- Rank / file labels
-    local label_color = "#c4b5a0"
-    local label_size = 18
-    for file = 0, 7 do
-        local x = ORIG_X + file * CELL + CELL / 2 - 5
-        local y = ORIG_Y + BOARD + 6
-        text({
-            x = x,
-            y = y,
-            font = font.cozette,
-            size = label_size,
-            fg = label_color,
-            bg = "#1e1812",
-            content = string.char(string.byte("a") + file),
-        })
-    end
-    for rank = 1, 8 do
-        local x = ORIG_X - 16
-        local y = ORIG_Y + (8 - rank) * CELL + CELL / 2 - 9
-        text({
-            x = x,
-            y = y,
-            font = font.cozette,
-            size = label_size,
-            fg = label_color,
-            bg = "#1e1812",
-            content = tostring(rank),
-        })
-    end
-
-    -- Title
-    text({
-        x = ORIG_X + 8,
-        y = 12,
-        font = font.cozette,
-        size = 22,
-        fg = "#e8dcc8",
-        bg = "#1e1812",
-        content = "Knight circuit",
-        blend = true,
-    })
-
-    -- PNG sprites under assets/pieces. If bR.png is missing, black rooks use wR + negative.
     local PIECE_DIR = "./assets/pieces/"
-    local has_black_rook_png = file_exists(PIECE_DIR .. "bR.png")
+    local has_bb_png = file_exists(PIECE_DIR .. "bB.png")
     local sz = math.floor(CELL * PIECE_SCALE)
 
-    local function place_piece(file, rank, code, is_white)
-        local x, y = piece_top_left(file, rank, sz)
-        local prefix = is_white and "w" or "b"
-        local src = PIECE_DIR .. prefix .. code .. ".png"
-        local opts = {
-            x = x,
-            y = y,
-            w = sz,
-            h = sz,
-            src = src,
-            motion = "none",
-        }
-        if code == "R" and not is_white and not has_black_rook_png then
-            opts.src = PIECE_DIR .. "wR.png"
-            opts.filter = filter.negative
+    local function add_piece(src, filter, path, seg_dur, arc, phase)
+        local f0, r0 = path[1][1], path[1][2]
+        local x0, y0 = piece_top_left(f0, r0, sz)
+        local opts = { x = x0, y = y0, w = sz, h = sz, src = src, motion = "none" }
+        if filter then
+            opts.filter = filter
         end
-        image(opts)
+        local id = image(opts)
+        table.insert(movers, {
+            id = id,
+            path = path,
+            seg_dur = seg_dur,
+            arc = arc,
+            phase = phase or 0,
+        })
+        return id
     end
 
-    local back_row = { "R", "N", "B", "Q", "K", "B", "N", "R" }
-    for file = 0, 7 do
-        place_piece(file, 8, back_row[file + 1], false)
-        place_piece(file, 7, "P", false)
-        place_piece(file, 2, "P", true)
-        -- g1 (file 6) knight is animated along KNIGHT_PATH; skip duplicate static sprite
-        if not (file == 6 and back_row[file + 1] == "N") then
-            place_piece(file, 1, back_row[file + 1], true)
-        end
+    add_piece(PIECE_DIR .. "wN.png", nil, KNIGHT_PATH, 0.72, true, 0)
+    add_piece(PIECE_DIR .. "wK.png", nil, WK_PATH, 1.05, false, 0.2)
+    add_piece(PIECE_DIR .. "bK.png", nil, BK_PATH, 1.35, false, 0.55)
+    local bb_src = PIECE_DIR .. "bB.png"
+    local bb_filt = nil
+    if not has_bb_png then
+        bb_src = PIECE_DIR .. "wB.png"
+        bb_filt = filter.negative
     end
+    -- Slightly quicker segments so the long loop completes in a pleasant time
+    add_piece(bb_src, bb_filt, BB_PATH, 0.52, false, 0.78)
+end
 
-    local kx, ky = piece_top_left(6, 1, sz)
-    knight_id = image({
-        x = kx,
-        y = ky,
-        w = sz,
-        h = sz,
-        src = PIECE_DIR .. "wN.png",
-        motion = "none",
-    })
+local function move_piece(m, sz, t)
+    local path = m.path
+    local n = #path
+    local seg_dur = m.seg_dur
+    local cycle = seg_dur * n
+    local cycle_t = (t + m.phase) % cycle
+    local seg = math.min(math.floor(cycle_t / seg_dur) + 1, n)
+    local raw_u = (cycle_t % seg_dur) / seg_dur
+    local u = smootherstep(raw_u)
+
+    local k1 = seg
+    local k2 = seg % n + 1
+
+    local f1, r1 = path[k1][1], path[k1][2]
+    local f2, r2 = path[k2][1], path[k2][2]
+
+    local x1, y1 = piece_top_left(f1, r1, sz)
+    local x2, y2 = piece_top_left(f2, r2, sz)
+    local dx, dy = x2 - x1, y2 - y1
+
+    local mx = x1 + dx * u
+    local my = y1 + dy * u
+
+    if m.arc then
+        local span = math.max(36, math.sqrt(dx * dx + dy * dy))
+        local arc_h = math.sin(u * math.pi) * math.min(38, span * 0.22)
+        my = my - arc_h
+        local squash = 1 + math.sin(u * math.pi) * 0.06
+        local dw = math.floor(sz * squash + 0.5)
+        local dh = math.floor(sz / squash + 0.5)
+        local ox = (sz - dw) * 0.5
+        local oy = (sz - dh) * 0.5
+        modify(m.id, { x = mx + ox, y = my + oy, w = dw, h = dh })
+    else
+        -- Kings / bishop: slight vertical bob while sliding (readable “step”)
+        local bob = math.sin(u * math.pi) * 5
+        my = my - bob
+        modify(m.id, { x = mx, y = my, w = sz, h = sz })
+    end
 end
 
 function update(dt)
     local t = time() * 0.001
 
-    -- Breathing colors on each square
     for i = 1, #squares do
         local s = squares[i]
-        local amp = s.dark and 10 or 14
-        local wobble = math.sin(t * 1.8 + s.file * 0.45 + s.rank * 0.45) * amp
+        local amp = s.dark and 6 or 9
+        local wobble = math.sin(t * 1.1 + s.file * 0.31 + s.rank * 0.31) * amp
         local base = s.dark and BASE_DARK or BASE_LIGHT
         modify(s.id, {
             color = hex({
                 r = math.max(0, math.min(255, base.r + wobble)),
-                g = math.max(0, math.min(255, base.g + wobble * 0.8)),
+                g = math.max(0, math.min(255, base.g + wobble * 0.75)),
                 b = math.max(0, math.min(255, base.b + wobble * 0.5)),
             }),
         })
     end
 
-    -- g1 knight: smooth travel along each edge of KNIGHT_PATH (closed loop)
     local sz = math.floor(CELL * PIECE_SCALE)
-    local n = #KNIGHT_PATH
-    local seg_dur = 0.85
-    local cycle = seg_dur * n
-    local cycle_t = t % cycle
-    local seg = math.min(math.floor(cycle_t / seg_dur) + 1, n)
-    local frac = (cycle_t % seg_dur) / seg_dur
-
-    local k1 = seg
-    local k2 = seg % n + 1
-
-    local f1, r1 = KNIGHT_PATH[k1][1], KNIGHT_PATH[k1][2]
-    local f2, r2 = KNIGHT_PATH[k2][1], KNIGHT_PATH[k2][2]
-
-    local x1, y1 = piece_top_left(f1, r1, sz)
-    local x2, y2 = piece_top_left(f2, r2, sz)
-    local hx = x1 + (x2 - x1) * frac
-    local hy = y1 + (y2 - y1) * frac
-
-    modify(knight_id, { x = hx, y = hy })
+    for i = 1, #movers do
+        move_piece(movers[i], sz, t)
+    end
 end
