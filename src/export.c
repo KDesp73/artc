@@ -6,20 +6,22 @@
 void Export(const char* format, const char* output, size_t fps)
 {
     char command[1024];
+    char frame_seq[96];
+    snprintf(frame_seq, sizeof(frame_seq), ".artc/frame%%%02dd.ppm", ARTC_EXPORT_FRAME_INDEX_WIDTH);
     int ret;
-    
+
     if (strcmp(format, "mp4") == 0) {
         ret = snprintf(command, sizeof(command),
-                "ffmpeg -v quiet -framerate %zu -i .artc/frame%%04d.ppm "
+                "ffmpeg -v quiet -framerate %zu -i %s "
                 "-r %zu -pix_fmt yuv420p -vsync cfr %s -y",
-                fps, fps, output);
+                fps, frame_seq, fps, output);
     } else if(strcmp(format, "gif") == 0) {
         char palette_command[1024];
-        
-        // Generate palette
-        ret = snprintf(palette_command, sizeof(palette_command), 
-            "ffmpeg -v quiet -framerate %zu -i .artc/frame%%04d.ppm -filter_complex \"[0:v] palettegen\" .artc/palette.png", 
-            fps);
+
+        /* Generate palette */
+        ret = snprintf(palette_command, sizeof(palette_command),
+            "ffmpeg -v quiet -framerate %zu -i %s -filter_complex \"[0:v] palettegen\" .artc/palette.png",
+            fps, frame_seq);
             
         if (ret < 0 || (size_t)ret >= sizeof(palette_command)) {
             fprintf(stderr, "Error: Palette command too long for buffer\n");
@@ -31,11 +33,11 @@ void Export(const char* format, const char* output, size_t fps)
             return;
         }
         
-        // Create GIF - use the same frame rate for input and output
+        /* Create GIF - use the same frame rate for input and output */
         ret = snprintf(command, sizeof(command),
-            "ffmpeg -v quiet -framerate %zu -i .artc/frame%%04d.ppm -i .artc/palette.png "
+            "ffmpeg -v quiet -framerate %zu -i %s -i .artc/palette.png "
             "-filter_complex \"[0:v][1:v] paletteuse=dither=none\" %s -y",
-            fps, output);
+            fps, frame_seq, output);
             
         if (ret < 0 || (size_t)ret >= sizeof(command)) {
             fprintf(stderr, "Error: GIF command too long for buffer\n");

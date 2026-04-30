@@ -61,7 +61,7 @@ void CliParse(CliValues* v, int argc, char** argv)
     LOOP_ARGS(opt, args) {
         switch (opt) {
             case 'h':
-                cli_help(args, "artc <FILE> [<OPTIONS>...]", "Written by KDesp73");
+                cli_help(args, "artc [OPTIONS] <FILE> [--] [SCRIPT_ARGS...]", "Written by KDesp73\n  Remaining words go to the Lua script as arg[1..n] (see arg.script). Optional -- is accepted but not required.");
                 // help();
                 exit(0);
             case 'v':

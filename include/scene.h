@@ -22,7 +22,7 @@ typedef struct {
 } Scene;
 
 Scene SceneLoadArt(const char* filename);
-Scene SceneLoadLua(const char* filename, bool sandbox);
+Scene SceneLoadLua(const char* filename, bool sandbox, int script_argc, char** script_argv);
 
 #endif // PARSER_H
 

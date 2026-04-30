@@ -1,0 +1,14 @@
+[Event "Engine V Engine"]
+[Site "Local Arena"]
+[Date "2026.04.23"]
+[Round "9"]
+[White "Stockfish 18 (2000 Elo)"]
+[Black "irida 0.10.0"]
+[Result "0-1"]
+
+1. Nf3 d5 2. d4 Nf6 3. c4 e6 4. Nc3 c6 5. Bg5 h6 6. Bxf6 Qxf6 7. e3 Nd7 8. Bd3
+dxc4 9. Bxc4 g6 10. O-O Bg7 11. Rc1 O-O 12. Re1 Rd8 13. Qe2 Qf5 14. Red1 Qh5 15.
+b4 Nb6 16. Ne4 Nxc4 17. Qxc4 a5 18. Rd2 Qg4 19. Qc2 f6 20. h3 Qf5 21. a3 axb4
+22. Nh4 Qh5 23. Nf3 Qa5 24. Nc5 Qxa3 25. Rb1 f5 26. Ne5 Qc3 27. Qd3 Bxe5 28. Qe2
+b3 29. Rd3 Qc4 30. dxe5 Rxd3 31. Qxd3 Qxc5 32. Qd8+ Qf8 33. Qc7 Qg7 34. Qb6 Qxe5
+35. Rxb3 Qd6 36. Rd3 Ra1+ 37. Qb1 Rxb1+ 38. Rd1 Rxd1# 0-1

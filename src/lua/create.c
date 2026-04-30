@@ -399,7 +399,7 @@ int lua_create_text(lua_State* L)
     }
     lua_pop(L, 1);
 
-    lua_getfield(L, -1, "blend");
+    lua_getfield(L, 1, "blend");
     text->blend = lua_toboolean(L, -1);
     lua_pop(L, 1);
 

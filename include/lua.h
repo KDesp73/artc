@@ -49,6 +49,14 @@ int lua_modify_entity(lua_State* L);
 int lua_clear_scene(lua_State* L);
 int lua_wait(lua_State* L);
 
+/*----------------.
+| Files / assets  |
+`---------------*/
+int lua_file_exists(lua_State* L);
+int lua_is_file(lua_State* L);
+int lua_read_file(lua_State* L);
+int lua_quit(lua_State* L);
+
 
 /*----------------.
 | Tables          |
@@ -85,6 +93,11 @@ static inline void setup_lua(lua_State* L)
     lua_register(L, "wait", lua_wait);
     lua_register(L, "clear", lua_clear_scene);
     lua_register(L, "modify", lua_modify_entity);
+
+    lua_register(L, "file_exists", lua_file_exists);
+    lua_register(L, "is_file", lua_is_file);
+    lua_register(L, "read_file", lua_read_file);
+    lua_register(L, "quit", lua_quit);
 
     register_filters_table(L);
     register_fonts_table(L);

@@ -10,6 +10,28 @@
 
 extern Scene scene;
 
+static int g_script_user_argc;
+
+static int lua_script_argc(lua_State* L)
+{
+    (void)L;
+    lua_pushinteger(L, (lua_Integer)g_script_user_argc);
+    return 1;
+}
+
+static void lua_push_arg_table(lua_State* L, const char* script_path, int argc, char** argv)
+{
+    lua_newtable(L);
+    lua_pushstring(L, script_path ? script_path : "");
+    lua_setfield(L, -2, "script");
+    for (int i = 0; i < argc; i++) {
+        const char* s = (argv && argv[i]) ? argv[i] : "";
+        lua_pushstring(L, s);
+        lua_rawseti(L, -2, i + 1);
+    }
+    lua_setglobal(L, "arg");
+}
+
 void timeout_hook(lua_State *L, lua_Debug *ar)
 {
     static int count = 0;
@@ -18,9 +40,10 @@ void timeout_hook(lua_State *L, lua_Debug *ar)
     }
 }
 
-Scene SceneLoadLua(const char* filename, bool sandbox)
+Scene SceneLoadLua(const char* filename, bool sandbox, int script_argc, char** script_argv)
 {
     memset(&scene, 0, sizeof(Scene));
+    g_script_user_argc = script_argc;
     scene.options.width = 640;
     scene.options.height = 480;
     scene.options.background = (SDL_Color){0, 0, 0, 255};
@@ -52,6 +75,9 @@ Scene SceneLoadLua(const char* filename, bool sandbox)
     }
 
     setup_lua(L);
+
+    lua_push_arg_table(L, filename, script_argc, script_argv);
+    lua_register(L, "script_argc", lua_script_argc);
 
     if (luaL_loadfile(L, (preprocessor_run) ? tmp_path : filename) != LUA_OK) {
         ERRO("Lua load error: %s", lua_tostring(L, -1));

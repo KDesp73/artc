@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 #include "cli.h"
 #include "entities.h"
 #include "export.h"
@@ -11,6 +12,7 @@
 #include "lua/lua.h"
 #include "scene.h"
 #include "view.h"
+#include "runtime.h"
 #define CLI_IMPLEMENTATION
 #include "io/cli.h"
 #define LOGGING_IMPLEMENTATION
@@ -51,13 +53,42 @@ int main(int argc, char** argv)
         WARN("Lua is not being sandboxed. With great power comes great responsibility");
     }
 
-    // Validate input
-    if (argc == 1 || argv[argc - 1][0] == '-') {
+    /* Positional args start at optind (after CliParse / getopt).
+       BSD/macOS getopt may advance optind past a leading "--", so the next token
+       can be the script file directly. Remaining tokens are script arguments;
+       an optional "--" before them is skipped if still present. */
+    int i = optind;
+    if (i >= argc) {
+        ERRO("Provide a file");
+        return 1;
+    }
+    if (strcmp(argv[i], "--") == 0) {
+        i++;
+        if (i >= argc) {
+            ERRO("Provide a file after --");
+            return 1;
+        }
+    }
+    if (argv[i][0] == '-' && strcmp(argv[i], "-") != 0) {
         ERRO("Provide a file");
         return 1;
     }
 
-    const char* file = argv[argc - 1];
+    const char* file = argv[i];
+    i++;
+
+    int lua_script_argc = 0;
+    char** lua_script_argv = NULL;
+    if (i < argc) {
+        if (strcmp(argv[i], "--") == 0) {
+            i++;
+        }
+        lua_script_argc = argc - i;
+        if (lua_script_argc > 0) {
+            lua_script_argv = &argv[i];
+        }
+    }
+
     if (!strstr(file, ".art") && !strstr(file, ".lua")) {
         ERRO("The file must have an .art or a .lua extension");
         return 1;
@@ -73,8 +104,8 @@ int main(int argc, char** argv)
 
     if (!strcmp(file_extension(file), "art"))
         scene = SceneLoadArt(file);
-    else 
-        scene = SceneLoadLua(file, values.sandbox);
+    else
+        scene = SceneLoadLua(file, values.sandbox, lua_script_argc, lua_script_argv);
 
     if (!scene.loaded) {
         ERRO("Could not load scene");
@@ -102,7 +133,8 @@ int main(int argc, char** argv)
     float accumulated_time = 0;
 
     // Main render loop
-    while (running && keep_running && (total_frames < 0 || frames_exported < total_frames)) {
+    while (running && keep_running && !artc_quit_is_requested()
+           && (total_frames < 0 || frames_exported < total_frames)) {
         Uint32 current_time = SDL_GetTicks();
         float real_delta = (current_time - frame_start) / 1000.0f;
         frame_start = current_time;
@@ -150,7 +182,7 @@ int main(int argc, char** argv)
             // Export frame
             if (values.export) {
                 char ppm_file[64];
-                snprintf(ppm_file, sizeof(ppm_file), ".artc/frame%04d.ppm", frames_exported);
+                snprintf(ppm_file, sizeof(ppm_file), ".artc/frame%0*d.ppm", ARTC_EXPORT_FRAME_INDEX_WIDTH, frames_exported);
                 SaveFrameToPPM(ppm_file, &view);
                 frames_exported++;
             }

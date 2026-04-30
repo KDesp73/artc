@@ -93,11 +93,29 @@ function rand(min, max) return 0 end
 -- @return string
 function hex(rgb) return "" end
 
+--- Returns whether a path exists and is readable (uses the host `file_exists`, not `io`)
+-- @param path string
+-- @return boolean
+function file_exists(path) return false end
+
+--- Returns whether a path is a regular file (not a directory)
+-- @param path string
+-- @return boolean
+function is_file(path) return false end
+
+--- Read an entire file as a string (host `load_file`, not `io.open`)
+-- @param path string
+-- @return string|nil
+function read_file(path) return nil end
+
 --- Clears the scene
 function clear() end
 
 --- Sleeps for ms time
 function wait(ms) end
+
+--- Exit the render loop on the next frame (closes window; stops export). Use after the animation should end (e.g. delay after last frame for recordings).
+function quit() end
 
 --- Set the seed
 -- @param seed number
@@ -111,6 +129,16 @@ function fps(fps) end
 -- @param id number
 -- @param props table: depends on the type of entity
 function modify(id, props) end
+
+--- Command-line arguments for the loaded script. After the scene file, remaining
+--- words are `arg[1]`, `arg[2]`, …; an optional `--` may appear before them.
+--- `arg.script` is the path to the loaded .lua / .art file.
+--- @class arg_cli
+arg = { script = "" }
+
+--- Number of strings passed after `--` on the command line
+-- @return integer
+function script_argc() return 0 end
 
 --- @class palette
 palette = {
