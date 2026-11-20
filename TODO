@@ -1,9 +1,13 @@
-TODO: destroy function
-TODO: custom motions
-TODO: groups
-TODO: presets
-TODO: high level primitives (spiral, wave, grid)
-TODO: polygon()
-DONE: color.rgba
-DONE: rect()
-DONE: elipses()
+TODO: destroy function []
+TODO: custom motions []
+TODO: groups []
+TODO: presets []
+TODO: high level primitives (spiral, wave, grid) []
+TODO: polygon() []
+DONE: color.rgba []
+DONE: rect() []
+DONE: elipses() []
+TODO: overlays [full screen overlays (filters)]
+TODO: UI Framework [Draw UI-like components on screen (example: atlas.lua)]
+TODO: Performance [Test and improve performance significantly]
+TODO: WASM [WASM build to live-render on the browser]
